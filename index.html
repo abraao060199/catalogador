@@ -349,7 +349,7 @@
     // ==========================================
     // APP ID DA DERIV REGISTRADO
     // ==========================================
-    const MY_APP_ID = "34tlOiTPkBhw0KUW9l1Pf";[span_3](start_span)[span_3](end_span)
+    const MY_APP_ID = "34tgDM9FOsSew19SzpAhP";[cite: 15]
 
     const statusBar = document.getElementById("status-bar");
     const liveRowEl = document.getElementById("live-row");
@@ -440,7 +440,6 @@
 
         syncTimer = setInterval(() => {
           const seg = new Date().getSeconds();
-          // Dispara 2 segundos antes do alvo da grade para compensar latência
           if ((seg + 2) % timingSecs === 0) {
             clearInterval(syncTimer);
             syncTimer = null;
