@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deriv Odd/Even Pro Analyzer & Trader</title>
+    <title>Deriv Odd/Even Pro & Advanced Bot Trader</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -48,7 +48,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent">Deriv Odd/Even Pro</h1>
-                <p class="text-xs text-slate-400">Análise de Dígitos & Automação em Tempo Real</p>
+                <p class="text-xs text-slate-400">Análise de Dígitos & Sistema Avançado de Entradas</p>
             </div>
         </div>
 
@@ -66,7 +66,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left Column: Controls & Live Feed (1 col on large) -->
+        <!-- Left Column: Controls & Live Feed -->
         <div class="space-y-6 flex flex-col">
             
             <!-- Asset & Connection Card -->
@@ -93,10 +93,16 @@
                         </select>
                     </div>
 
-                    <button id="connect-btn" onclick="toggleConnection()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-plug"></i>
-                        <span id="connect-btn-text">Conectar à Deriv</span>
-                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="connect-btn" onclick="toggleConnection()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-plug"></i>
+                            <span id="connect-btn-text">Conectar API</span>
+                        </button>
+                        <button id="sim-btn" onclick="toggleSimulator()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-play"></i>
+                            <span id="sim-btn-text">Modo Sim</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -126,7 +132,7 @@
 
                 <!-- Recent Digits History Bar -->
                 <div class="mt-5">
-                    <span class="text-xs font-medium text-slate-400 block mb-2">Últimos 10 Dígitos (Esq = Mais Recente)</span>
+                    <span class="text-xs font-medium text-slate-400 block mb-2">Últimos 15 Dígitos (Esq = Mais Recente)</span>
                     <div id="recent-digits-list" class="flex space-x-1.5 overflow-x-auto pb-1">
                         <span class="text-xs text-slate-500 italic">Nenhum histórico ainda.</span>
                     </div>
@@ -135,7 +141,7 @@
 
         </div>
 
-        <!-- Right Column: Statistics & Trading Simulation (2 cols on large) -->
+        <!-- Right Column: Statistics & Advanced Trading Management Panel -->
         <div class="lg:col-span-2 space-y-6 flex flex-col">
             
             <!-- Analytics & Percentage Stats Grid -->
@@ -204,76 +210,136 @@
                 </div>
             </div>
 
-            <!-- Trading Simulation & Execution Panel -->
             <div class="bg-deriv-card rounded-2xl border border-deriv-border p-5 shadow-xl flex-1 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-                            <span>Painel de Operação / Simulação</span>
+                            <span>Gerenciamento de Entradas & Bot Automático</span>
                             <i class="fa-solid fa-robot text-emerald-400"></i>
                         </h2>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs text-slate-400">Modo:</span>
-                            <select id="exec-mode" class="bg-slate-900 border border-deriv-border text-xs rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-pink-500">
-                                <option value="sim">Simulação (Local)</option>
-                                <option value="real">Real / Demo (API Token)</option>
-                            </select>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-1 bg-slate-900 px-2.5 py-1 rounded-lg border border-deriv-border">
+                                <span class="text-[10px] text-slate-400">Modo:</span>
+                                <select id="exec-mode" class="bg-transparent text-xs text-slate-200 focus:outline-none">
+                                    <option value="sim">Simulação (Local)</option>
+                                    <option value="real">Real / Demo (API Token)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <!-- Stake & Martingale Settings Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                         <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1">Valor da Entrada (Stake $)</label>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Stake Inicial ($)</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 text-sm">$</span>
-                                <input type="number" id="stake-input" value="1.00" min="0.35" step="0.1" class="w-full bg-slate-900 border border-deriv-border rounded-xl pl-8 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500 transition">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 text-xs">$</span>
+                                <input type="number" id="stake-input" value="1.00" min="0.35" step="0.1" class="w-full bg-slate-900 border border-deriv-border rounded-xl pl-7 pr-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1">Duração / Ticks</label>
-                            <input type="number" id="duration-input" value="1" min="1" max="10" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500 transition" disabled>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Multiplicador Martingale</label>
+                            <input type="number" id="martingale-input" value="2.0" min="1.0" step="0.1" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Máx. Gales Sequenciais</label>
+                            <input type="number" id="max-martingale-input" value="5" min="0" max="10" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- Risk Management (Take Profit / Stop Loss) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+                        <div>
+                            <label class="block text-[11px] font-medium text-emerald-400 mb-1">Take Profit (Meta de Lucro $)</label>
+                            <input type="number" id="take-profit-input" value="10.00" min="1.0" step="1.0" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-rose-400 mb-1">Stop Loss (Limite de Perda $)</label>
+                            <input type="number" id="stop-loss-input" value="20.00" min="1.0" step="1.0" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-rose-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Auto Bot Strategy Trigger Settings -->
+                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i>
+                                <span>Gatilho de Entrada Automática (Bot Strategist)</span>
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="auto-bot-toggle" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Entrar após streak de:</label>
+                                <select id="bot-strategy-trigger" class="w-full bg-slate-900 border border-deriv-border rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
+                                    <option value="3">3 repetições seguidas</option>
+                                    <option value="4">4 repetições seguidas</option>
+                                    <option value="5" selected>5 repetições seguidas</option>
+                                    <option value="6">6 repetições seguidas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Aposta Automática em:</label>
+                                <select id="bot-strategy-action" class="w-full bg-slate-900 border border-deriv-border rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
+                                    <option value="REVERSE">Entrar no Reverso (Quebra de Streak)</option>
+                                    <option value="FOLLOW">Seguir a Tendência (Continuar Streak)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Action Buttons -->
                     <div class="grid grid-cols-2 gap-4">
-                        <button onclick="executeTrade('EVEN')" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 transition flex flex-col items-center justify-center space-y-1">
-                            <span class="text-base tracking-wide flex items-center space-x-2">
+                        <button onclick="executeTrade('EVEN')" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 transition flex flex-col items-center justify-center space-y-0.5">
+                            <span class="text-sm tracking-wide flex items-center space-x-2">
                                 <i class="fa-solid fa-arrow-down-up-across-line"></i>
                                 <span>ENTRAR PAR (EVEN)</span>
                             </span>
-                            <span class="text-[10px] text-blue-200 font-normal">Dígitos 0, 2, 4, 6, 8</span>
+                            <span class="text-[9px] text-blue-200 font-normal">Dígitos 0, 2, 4, 6, 8</span>
                         </button>
 
-                        <button onclick="executeTrade('ODD')" class="bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-pink-600/30 transition flex flex-col items-center justify-center space-y-1">
-                            <span class="text-base tracking-wide flex items-center space-x-2">
+                        <button onclick="executeTrade('ODD')" class="bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-pink-600/30 transition flex flex-col items-center justify-center space-y-0.5">
+                            <span class="text-sm tracking-wide flex items-center space-x-2">
                                 <i class="fa-solid fa-arrows-split-up-and-left"></i>
                                 <span>ENTRAR ÍMPAR (ODD)</span>
                             </span>
-                            <span class="text-[10px] text-pink-200 font-normal">Dígitos 1, 3, 5, 7, 9</span>
+                            <span class="text-[9px] text-pink-200 font-normal">Dígitos 1, 3, 5, 7, 9</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Session P/L Tracker -->
-                <div class="mt-5 pt-4 border-t border-deriv-border flex items-center justify-between text-xs">
-                    <div class="flex items-center space-x-4">
-                        <div>
-                            <span class="text-slate-400 block">Operações:</span>
-                            <span id="stat-total-trades" class="font-bold text-slate-200">0</span>
+                <div class="mt-5 pt-4 border-t border-deriv-border">
+                    <div class="flex items-center justify-between text-xs mb-3">
+                        <div class="flex items-center space-x-4">
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Operações:</span>
+                                <span id="stat-total-trades" class="font-bold text-slate-200">0</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Wins:</span>
+                                <span id="stat-wins" class="font-bold text-emerald-400">0</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Losses:</span>
+                                <span id="stat-losses" class="font-bold text-rose-400">0</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Nível Gale:</span>
+                                <span id="stat-current-gale" class="font-bold text-amber-400">0</span>
+                            </div>
                         </div>
-                        <div>
-                            <span class="text-slate-400 block">Acertos (Win):</span>
-                            <span id="stat-wins" class="font-bold text-emerald-400">0</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">Erros (Loss):</span>
-                            <span id="stat-losses" class="font-bold text-rose-400">0</span>
+                        <div class="text-right">
+                            <span class="text-slate-400 block text-[10px]">Resultado da Sessão (P/L)</span>
+                            <span id="session-pl" class="font-mono font-bold text-sm text-slate-200">$0.00</span>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-slate-400 block">Resultado da Sessão</span>
-                        <span id="session-pl" class="font-mono font-bold text-sm text-slate-200">$0.00</span>
+
+                    <!-- Trade Activity Log Box -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 max-h-28 overflow-y-auto font-mono text-[11px]" id="trade-log-container">
+                        <div class="text-slate-500 italic">Logs de operação aparecerão aqui...</div>
                     </div>
                 </div>
 
@@ -283,6 +349,7 @@
 
     </main>
 
+    <!-- Config Modal -->
     <div id="config-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-deriv-card border border-deriv-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <div class="flex items-center justify-between mb-4">
@@ -322,6 +389,7 @@
         </div>
     </div>
 
+    <!-- Notification Toast -->
     <div id="notification-box" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm w-full bg-slate-900 border border-slate-700 rounded-2xl p-4 shadow-2xl flex items-center space-x-3">
         <div id="notif-icon" class="text-xl"></div>
         <div class="flex-1">
@@ -336,6 +404,9 @@
         let apiToken = '';
         let currentSymbol = 'R_100';
         let isConnected = false;
+        let simInterval = null;
+        let isSimulating = false;
+        let currentSimPrice = 1000.00000;
         
         // Analytics state
         let tickHistory = [];
@@ -348,13 +419,15 @@
         let maxEvenStreak = 0;
         let maxOddStreak = 0;
 
-        // Trading stats
+        // Trading & Martingale state
         let stats = {
             total: 0,
             wins: 0,
             losses: 0,
             pl: 0.0
         };
+        let currentMartingaleStep = 0;
+        let activeTradeLock = false;
 
         // Initialize frequency grid on load
         window.onload = function() {
@@ -379,10 +452,10 @@
             }
         }
 
-        function toggleModal(modalId) {
+        window.toggleModal = function(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.toggle('hidden');
-        }
+        };
 
         function showNotification(title, desc, type = 'info') {
             const box = document.getElementById('notification-box');
@@ -407,28 +480,86 @@
             }, 4000);
         }
 
-        function saveConfig() {
+        function addTradeLog(message, type = 'info') {
+            const logContainer = document.getElementById('trade-log-container');
+            if(logContainer.innerHTML.includes('Logs de operação')) {
+                logContainer.innerHTML = '';
+            }
+            const timeStr = new Date().toLocaleTimeString();
+            const colorClass = type === 'success' ? 'text-emerald-400' : (type === 'error' ? 'text-rose-400' : 'text-slate-300');
+            
+            const div = document.createElement('div');
+            div.className = `${colorClass} py-0.5 border-b border-slate-800/40 text-[11px]`;
+            div.innerHTML = `<span class="text-slate-500">[${timeStr}]</span> ${message}`;
+            logContainer.prepend(div);
+        }
+
+        window.saveConfig = function() {
             const appInput = document.getElementById('config-appid').value.trim();
             const tokenInput = document.getElementById('config-token').value.trim();
             if(appInput) appId = appInput;
             apiToken = tokenInput;
-            toggleModal('config-modal');
+            window.toggleModal('config-modal');
             showNotification('Configurações Salvas', 'Reconectando à API com novos parâmetros...', 'success');
             if(isConnected) {
                 disconnectWS();
             }
-            connectWS();
-        }
+            window.connectWS();
+        };
 
-        function toggleConnection() {
+        window.toggleConnection = function() {
+            if(isSimulating) toggleSimulator();
             if(isConnected) {
                 disconnectWS();
             } else {
-                connectWS();
+                window.connectWS();
             }
-        }
+        };
 
-        function connectWS() {
+        window.toggleSimulator = function() {
+            if(isConnected) disconnectWS(false);
+            
+            const statusEl = document.getElementById('status-text');
+            const indicatorEl = document.querySelector('#connection-status span');
+            const simBtnText = document.getElementById('sim-btn-text');
+            const simBtn = document.getElementById('sim-btn');
+
+            if(isSimulating) {
+                clearInterval(simInterval);
+                isSimulating = false;
+                statusEl.innerText = 'Desconectado';
+                statusEl.className = 'text-amber-400';
+                indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+                simBtnText.innerText = 'Modo Sim';
+                simBtn.className = 'w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-1.5';
+                showNotification('Simulador', 'Simulador pausado.', 'info');
+                addTradeLog('Simulador pausado.', 'error');
+            } else {
+                isSimulating = true;
+                statusEl.innerText = 'Simulador Ativo';
+                statusEl.className = 'text-emerald-400';
+                indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                simBtnText.innerText = 'Parar Sim';
+                simBtn.className = 'w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-rose-600/20 flex items-center justify-center space-x-1.5';
+                
+                showNotification('Simulador Iniciado', 'Gerando ticks sintéticos em tempo real.', 'success');
+                addTradeLog('Simulador local ativado com sucesso.', 'info');
+
+                currentSymbol = document.getElementById('symbol-select').value;
+                simInterval = setInterval(() => {
+                    const delta = (Math.random() - 0.495) * 2.5;
+                    currentSimPrice = Math.max(10, currentSimPrice + delta);
+                    const pipSize = currentSymbol.includes('1HZ') ? 2 : 2;
+                    processTick({
+                        quote: currentSimPrice,
+                        pip_symbol: currentSymbol,
+                        pip_size: pipSize
+                    });
+                }, 1000);
+            }
+        };
+
+        window.connectWS = function() {
             const statusEl = document.getElementById('status-text');
             const indicatorEl = document.querySelector('#connection-status span');
             const btnText = document.getElementById('connect-btn-text');
@@ -441,7 +572,13 @@
             currentSymbol = document.getElementById('symbol-select').value;
             const wsUrl = `wss://ws.derivws.com/websockets/v3?app_id=${appId}`;
             
-            ws = new WebSocket(wsUrl);
+            try {
+                ws = new WebSocket(wsUrl);
+            } catch(e) {
+                console.error('WebSocket Exception:', e);
+                tryFallbackWebSocket();
+                return;
+            }
 
             ws.onopen = function() {
                 isConnected = true;
@@ -452,19 +589,17 @@
                 connectBtn.className = 'w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-rose-600/20 flex items-center justify-center space-x-2';
                 
                 showNotification('Conexão Estabelecida', `Conectado com sucesso ao App ID ${appId}`, 'success');
+                addTradeLog(`Conectado ao ativo ${currentSymbol}`, 'info');
 
-                // If token provided, authorize
                 if(apiToken) {
                     ws.send(JSON.stringify({ authorize: apiToken }));
                 }
 
-                // Subscribe to ticks for selected symbol
                 ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
             };
 
             ws.onmessage = function(event) {
                 const data = JSON.parse(event.data);
-                
                 if(data.msg_type === 'tick') {
                     processTick(data.tick);
                 } else if(data.msg_type === 'authorize') {
@@ -478,11 +613,56 @@
 
             ws.onerror = function(error) {
                 console.error('WebSocket Error:', error);
-                showNotification('Erro de Conexão', 'Falha na comunicação com o WebSocket da Deriv.', 'error');
+                tryFallbackWebSocket();
             };
 
             ws.onclose = function() {
-                disconnectWS(false);
+                if(isConnected) {
+                    disconnectWS(false);
+                }
+            };
+        };
+
+        function tryFallbackWebSocket() {
+            const statusEl = document.getElementById('status-text');
+            statusEl.innerText = 'Tentando Fallback...';
+            
+            const fallbackUrl = `wss://ws.binaryws.com/websockets/v3?app_id=${appId}`;
+            try {
+                ws = new WebSocket(fallbackUrl);
+            } catch(e) {
+                statusEl.innerText = 'Falha na Conexão';
+                showNotification('Erro de Conexão', 'Não foi possível conectar aos servidores Deriv/Binary. Use o [Modo Sim] para operar offline.', 'error');
+                addTradeLog('Falha ao conectar via WebSocket. Sugerido Modo Simulador.', 'error');
+                return;
+            }
+
+            ws.onopen = function() {
+                isConnected = true;
+                document.getElementById('status-text').innerText = 'Conectado (Alt)';
+                document.getElementById('status-text').className = 'text-emerald-400';
+                document.querySelector('#connection-status span').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                document.getElementById('connect-btn-text').innerText = 'Desconectar';
+                showNotification('Conexão Alternativa', 'Conectado com sucesso via servidor secundário.', 'success');
+                addTradeLog(`Conectado ao ativo ${currentSymbol} (servidor alternativo)`, 'info');
+
+                if(apiToken) ws.send(JSON.stringify({ authorize: apiToken }));
+                ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if(data.msg_type === 'tick') processTick(data.tick);
+            };
+
+            ws.onerror = function() {
+                document.getElementById('status-text').innerText = 'Falha na Conexão';
+                showNotification('Erro de Conexão', 'Conexão bloqueada pela rede. Ative o [Modo Sim] para testar todas as análises e bots.', 'error');
+                addTradeLog('Erro crítico de WebSocket. Ative o Modo Sim.', 'error');
+            };
+
+            ws.onclose = function() {
+                if(isConnected) disconnectWS(false);
             };
         }
 
@@ -500,20 +680,22 @@
             statusEl.innerText = 'Desconectado';
             statusEl.className = 'text-amber-400';
             indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-            btnText.innerText = 'Conectar à Deriv';
+            btnText.innerText = 'Conectar API';
             connectBtn.className = 'w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-2';
 
             if(notify) {
                 showNotification('Desconectado', 'Sessão encerrada.', 'info');
+                addTradeLog('Sessão desconectada.', 'error');
             }
         }
 
-        // Handle symbol change on dropdown
         document.getElementById('symbol-select').addEventListener('change', function(e) {
+            currentSymbol = e.target.value;
             if(isConnected && ws) {
-                // Forget previous subscription if needed or simply reconnect
                 disconnectWS(false);
-                connectWS();
+                window.connectWS();
+            } else if(isSimulating) {
+                addTradeLog(`Ativo alterado para ${currentSymbol}`, 'info');
             }
         });
 
@@ -526,7 +708,6 @@
 
             if(isNaN(digit)) return;
 
-            // Update Price & Direction
             const priceDisplay = document.getElementById('price-display');
             const prevPrice = parseFloat(priceDisplay.innerText) || price;
             priceDisplay.innerText = priceStr;
@@ -545,7 +726,6 @@
 
             const isEven = digit % 2 === 0;
 
-            // Update Digit Box UI
             const digitBox = document.getElementById('last-digit-box');
             const typeBadge = document.getElementById('digit-type-badge');
 
@@ -560,12 +740,10 @@
                 typeBadge.innerText = 'ÍMPAR (ODD)';
             }
 
-            // Update Statistics
             totalTicks++;
             digitCounts[digit]++;
             if(isEven) evenCount++; else oddCount++;
 
-            // Streak tracking
             const typeStr = isEven ? 'EVEN' : 'ODD';
             if(currentStreakType === typeStr) {
                 currentStreakCount++;
@@ -581,15 +759,14 @@
                 maxOddStreak = currentStreakCount;
             }
 
-            // Push to history
             tickHistory.unshift({ digit, isEven, time: new Date() });
             if(tickHistory.length > 50) tickHistory.pop();
 
             updateStatsUI();
+            checkAutoBotTrigger(typeStr, currentStreakCount);
         }
 
         function updateStatsUI() {
-            // Total ticks & percentages
             document.getElementById('total-ticks-count').innerText = `${totalTicks} Ticks`;
             const evenPct = totalTicks > 0 ? ((evenCount / totalTicks) * 100).toFixed(1) : '50.0';
             const oddPct = totalTicks > 0 ? ((oddCount / totalTicks) * 100).toFixed(1) : '50.0';
@@ -599,7 +776,6 @@
             document.getElementById('even-bar').style.width = `${evenPct}%`;
             document.getElementById('odd-bar').style.width = `${oddPct}%`;
 
-            // Streaks
             const streakTypeEl = document.getElementById('current-streak-type');
             streakTypeEl.innerText = currentStreakType ? (currentStreakType === 'EVEN' ? 'PAR' : 'ÍMPAR') : 'Nenhuma';
             streakTypeEl.className = `text-xs font-bold uppercase tracking-wider mb-1 ${currentStreakType === 'EVEN' ? 'text-blue-400' : 'text-pink-400'}`;
@@ -607,7 +783,6 @@
             document.getElementById('max-even-streak').innerText = maxEvenStreak;
             document.getElementById('max-odd-streak').innerText = maxOddStreak;
 
-            // Frequency Grid
             for(let i=0; i<10; i++) {
                 const count = digitCounts[i];
                 const pct = totalTicks > 0 ? ((count / totalTicks) * 100).toFixed(1) : '0.0';
@@ -616,7 +791,6 @@
             }
             document.getElementById('sample-size-text').innerText = `Amostra: ${totalTicks} ticks`;
 
-            // Recent digits list
             const listEl = document.getElementById('recent-digits-list');
             listEl.innerHTML = '';
             tickHistory.slice(0, 15).forEach(item => {
@@ -628,35 +802,74 @@
             });
         }
 
-        // Trading Execution / Simulation
-        function executeTrade(type) {
-            const stake = parseFloat(document.getElementById('stake-input').value) || 1.00;
+        function checkAutoBotTrigger(typeStr, streakCount) {
+            const isBotActive = document.getElementById('auto-bot-toggle').checked;
+            if(!isBotActive || activeTradeLock) return;
+
+            const targetTrigger = parseInt(document.getElementById('bot-strategy-trigger').value);
+            const strategyAction = document.getElementById('bot-strategy-action').value;
+
+            if(streakCount >= targetTrigger) {
+                let predictedType = '';
+                if(strategyAction === 'REVERSE') {
+                    predictedType = typeStr === 'EVEN' ? 'ODD' : 'EVEN';
+                } else {
+                    predictedType = typeStr;
+                }
+
+                addTradeLog(`Bot acionado por streak de ${streakCount} ${typeStr}. Entrando em ${predictedType}`, 'info');
+                executeTrade(predictedType);
+            }
+        }
+
+        window.executeTrade = function(type) {
+            const baseStake = parseFloat(document.getElementById('stake-input').value) || 1.00;
+            const martingaleMul = parseFloat(document.getElementById('martingale-input').value) || 2.0;
+            const maxGales = parseInt(document.getElementById('max-martingale-input').value) || 5;
+            const takeProfit = parseFloat(document.getElementById('take-profit-input').value) || 10.00;
+            const stopLoss = parseFloat(document.getElementById('stop-loss-input').value) || 20.00;
             const mode = document.getElementById('exec-mode').value;
+
+            if(stats.pl >= takeProfit) {
+                showNotification('Meta Atingida!', `Take Profit de $${takeProfit.toFixed(2)} alcançado. Bot pausado.`, 'success');
+                document.getElementById('auto-bot-toggle').checked = false;
+                return;
+            }
+            if(stats.pl <= -stopLoss) {
+                showNotification('Stop Loss Atingido!', `Limite de perda de -$${stopLoss.toFixed(2)} atingido. Bot pausado por segurança.`, 'error');
+                document.getElementById('auto-bot-toggle').checked = false;
+                return;
+            }
 
             if(tickHistory.length === 0) {
                 showNotification('Aviso', 'Aguardando o próximo tick para validar a entrada.', 'error');
                 return;
             }
 
+            let currentStake = baseStake * Math.pow(martingaleMul, currentMartingaleStep);
+            
+            if(activeTradeLock && mode === 'sim') {
+                return;
+            }
+
+            activeTradeLock = true;
+            addTradeLog(`Iniciando operação em ${type} com Stake de $${currentStake.toFixed(2)} (Gale: ${currentMartingaleStep})`, 'info');
+
             if(mode === 'real') {
                 if(!apiToken) {
-                    showNotification('Token Necessário', 'Configure seu token de API nas configurações para operar na conta real/demo.', 'error');
-                    toggleModal('config-modal');
+                    showNotification('Token Necessário', 'Configure seu token nas configurações para operar na conta real/demo.', 'error');
+                    window.toggleModal('config-modal');
+                    activeTradeLock = false;
                     return;
                 }
-                showNotification('Modo API Real', 'Execução via API real pendente de integração de contrato no WebSocket.', 'info');
-                // Aqui entraria a chamada buy contract via send do ws se necessário
+                showNotification('Modo API Real', 'Execução via API real pendente de envio de contrato no WebSocket.', 'info');
+                activeTradeLock = false;
             } else {
-                // Simulação local baseada no próximo tick recebido ou simulado instantâneo
-                simulateLocalTrade(type, stake);
+                simulateLocalTrade(type, currentStake, maxGales);
             }
-        }
+        };
 
-        function simulateLocalTrade(predictedType, stake) {
-            // Aguarda o próximo tick para verificar o resultado
-            showNotification('Simulação Iniciada', `Entrada de $${stake.toFixed(2)} em ${predictedType === 'EVEN' ? 'PAR' : 'ÍMPAR'} registrada. Aguardando resultado...`, 'info');
-            
-            // Vamos simular o resultado após 1 tick simulado/real
+        function simulateLocalTrade(predictedType, stake, maxGales) {
             const checkNextTick = setInterval(() => {
                 if(tickHistory.length > 0) {
                     clearInterval(checkNextTick);
@@ -666,16 +879,28 @@
                     stats.total++;
                     if(won) {
                         stats.wins++;
-                        const profit = stake * 0.95; // Retorno médio estimado de payout
+                        const profit = stake * 0.95;
                         stats.pl += profit;
-                        showNotification('Vitória! (WIN)', `Dígito sorteado: ${lastTick.digit}. Lucro: +$${profit.toFixed(2)}`, 'success');
+                        showNotification('Vitória! (WIN)', `Dígito: ${lastTick.digit}. Lucro: +$${profit.toFixed(2)}`, 'success');
+                        addTradeLog(`WIN! Dígito ${lastTick.digit} (${predictedType}). Lucro +$${profit.toFixed(2)}`, 'success');
+                        currentMartingaleStep = 0;
                     } else {
                         stats.losses++;
                         stats.pl -= stake;
-                        showNotification('Derrota! (LOSS)', `Dígito sorteado: ${lastTick.digit}. Prejuízo: -$${stake.toFixed(2)}`, 'error');
+                        showNotification('Derrota! (LOSS)', `Dígito: ${lastTick.digit}. Prejuízo: -$${stake.toFixed(2)}`, 'error');
+                        addTradeLog(`LOSS! Dígito ${lastTick.digit} (${predictedType}). Perda -$${stake.toFixed(2)}`, 'error');
+                        
+                        if(currentMartingaleStep < maxGales) {
+                            currentMartingaleStep++;
+                            addTradeLog(`Aplicando Martingale. Próximo Gale: Nível ${currentMartingaleStep}`, 'info');
+                        } else {
+                            addTradeLog(`Máximo de gales (${maxGales}) atingido. Reiniciando ciclo.`, 'error');
+                            currentMartingaleStep = 0;
+                        }
                     }
 
                     updateTradingStatsUI();
+                    activeTradeLock = false;
                 }
             }, 1000);
         }
@@ -684,9 +909,11 @@
             document.getElementById('stat-total-trades').innerText = stats.total;
             document.getElementById('stat-wins').innerText = stats.wins;
             document.getElementById('stat-losses').innerText = stats.losses;
+            document.getElementById('stat-current-gale').innerText = currentMartingaleStep;
             
             const plEl = document.getElementById('session-pl');
-            plEl.innerText = `${stats.pl >= }^{\\+\\$}$${stats.pl.toFixed(2)}`;
+            const sign = stats.pl > 0 ? '+$' : (stats.pl < 0 ? '-$' : '$');
+            plEl.innerText = `${sign}${Math.abs(stats.pl).toFixed(2)}`;
             if(stats.pl > 0) {
                 plEl.className = 'font-mono font-bold text-sm text-emerald-400';
             } else if(stats.pl < 0) {
