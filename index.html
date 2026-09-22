@@ -364,7 +364,7 @@
             </div>
 
             <p class="text-xs text-slate-400 mb-4">
-                Escolha o canal WebSocket e insira seu App ID e token (se necessário). Caso sua rede bloqueie WebSockets externos, use o <b>Modo Sim</b> para análise instantânea.
+                Utilize o endpoint público oficial de opções da Deriv ou o servidor padrão. Caso sua rede bloqueie WebSockets externos, use o <b>Modo Sim</b>.
             </p>
 
             <div class="space-y-4">
@@ -374,10 +374,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Servidor WebSocket</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Servidor WebSocket (Options Public)</label>
                     <select id="config-endpoint" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500">
+                        <option value="wss://api.derivws.com/trading/v1/options/ws/public" selected>Deriv Options Public (api.derivws.com)</option>
                         <option value="wss://ws.derivws.com/websockets/v3">Deriv Standard (ws.derivws.com)</option>
-                        <option value="wss://api.derivws.com/trading/v1/options/ws/public">Deriv Options Public (api.derivws.com)</option>
                         <option value="wss://ws.binaryws.com/websockets/v3">Binary Secondary (ws.binaryws.com)</option>
                     </select>
                 </div>
@@ -412,7 +412,7 @@
         let ws = null;
         let appId = '1089';
         let apiToken = '';
-        let currentEndpoint = 'wss://ws.derivws.com/websockets/v3';
+        let currentEndpoint = 'wss://api.derivws.com/trading/v1/options/ws/public';
         let currentSymbol = 'R_100';
         let isConnected = false;
         let simInterval = null;
@@ -584,12 +584,14 @@
 
             currentSymbol = document.getElementById('symbol-select').value;
             
-            // Construir URL correta dependendo do endpoint escolhido
             let wsUrl = currentEndpoint;
-            if(!wsUrl.includes('?')) {
-                wsUrl += `?app_id=${appId}`;
-            } else if(!wsUrl.includes('app_id=')) {
-                wsUrl += `&app_id=${appId}`;
+            // Se for endpoint options/ws/public, não requer query param app_id na URL
+            if(!wsUrl.includes('trading/v1/options/ws/public')) {
+                if(!wsUrl.includes('?')) {
+                    wsUrl += `?app_id=${appId}`;
+                } else if(!wsUrl.includes('app_id=')) {
+                    wsUrl += `&app_id=${appId}`;
+                }
             }
             
             try {
@@ -611,31 +613,37 @@
                 showNotification('Conexão Estabelecida', `Conectado com sucesso ao servidor Deriv`, 'success');
                 addTradeLog(`Conectado ao ativo ${currentSymbol}`, 'info');
 
-                if(wsUrl.includes('ws/public')) {
-                    // Novo formato público
+                // Handshake obrigatório para options/ws/public
+                if(wsUrl.includes('trading/v1/options/ws/public')) {
                     ws.send(JSON.stringify({ "ws_public": 1 }));
                 }
 
-                if(apiToken && !wsUrl.includes('ws/public')) {
-                    ws.send(JSON.stringify({ authorize: apiToken }));
-                }
-
-                // Subscrição universal de tick
-                ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
+                // Subscrição de tick (suporta tanto o formato padrão quanto o novo underlying_symbol)
+                setTimeout(() => {
+                    if(wsUrl.includes('trading/v1/options/ws/public')) {
+                        ws.send(JSON.stringify({ ticks: currentSymbol, underlying_symbol: currentSymbol, subscribe: 1 }));
+                    } else {
+                        ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
+                    }
+                }, 300);
             };
 
             ws.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                if(data.msg_type === 'tick' && data.tick) {
-                    processTick(data.tick);
-                } else if(data.tick) {
-                    processTick(data.tick);
-                } else if(data.msg_type === 'authorize') {
-                    if(data.error) {
-                        showNotification('Erro de Autorização', data.error.message, 'error');
-                    } else {
-                        showNotification('Autorizado', `Conectado com sucesso à conta Deriv.`, 'success');
+                try {
+                    const data = JSON.parse(event.data);
+                    if(data.msg_type === 'tick' && data.tick) {
+                        processTick(data.tick);
+                    } else if(data.tick) {
+                        processTick(data.tick);
+                    } else if(data.quote) {
+                        processTick({
+                            quote: data.quote,
+                            pip_symbol: data.underlying_symbol || currentSymbol,
+                            pip_size: data.pip_size || 2
+                        });
                     }
+                } catch(err) {
+                    console.error('Erro ao processar mensagem do WS:', err);
                 }
             };
 
@@ -655,7 +663,7 @@
             const statusEl = document.getElementById('status-text');
             statusEl.innerText = 'Tentando Fallback...';
             
-            const fallbackUrl = `wss://ws.binaryws.com/websockets/v3?app_id=${appId}`;
+            const fallbackUrl = `wss://ws.derivws.com/websockets/v3?app_id=${appId}`;
             try {
                 ws = new WebSocket(fallbackUrl);
             } catch(e) {
@@ -667,14 +675,13 @@
 
             ws.onopen = function() {
                 isConnected = true;
-                document.getElementById('status-text').innerText = 'Conectado (Alt)';
+                document.getElementById('status-text').innerText = 'Conectado (Std)';
                 document.getElementById('status-text').className = 'text-emerald-400';
                 document.querySelector('#connection-status span').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
                 document.getElementById('connect-btn-text').innerText = 'Desconectar';
-                showNotification('Conexão Alternativa', 'Conectado com sucesso via servidor secundário.', 'success');
-                addTradeLog(`Conectado ao ativo ${currentSymbol} (servidor alternativo)`, 'info');
+                showNotification('Conexão Padrão', 'Conectado com sucesso via servidor padrão Deriv.', 'success');
+                addTradeLog(`Conectado ao ativo ${currentSymbol} (servidor padrão)`, 'info');
 
-                if(apiToken) ws.send(JSON.stringify({ authorize: apiToken }));
                 ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
             };
 
@@ -888,14 +895,44 @@
             addTradeLog(`Iniciando operação em ${type} com Stake de $${currentStake.toFixed(2)} (Gale: ${currentMartingaleStep})`, 'info');
 
             if(mode === 'real' && !isSimulating) {
-                if(!apiToken) {
-                    showNotification('Token Necessário', 'Configure seu token nas configurações para operar na conta real/demo.', 'error');
-                    window.toggleModal('config-modal');
+                if(!ws || !isConnected) {
+                    showNotification('Erro', 'Conecte-se à API WebSocket primeiro ou ative o Modo Sim.', 'error');
                     activeTradeLock = false;
                     return;
                 }
-                showNotification('Modo API Real', 'Execução via API real pendente de envio de contrato no WebSocket.', 'info');
-                activeTradeLock = false;
+                
+                // Exemplo de requisição de compra proposal/buy na API Deriv
+                ws.send(JSON.stringify({
+                    proposal: 1,
+                    amount: currentStake,
+                    basis: 'stake',
+                    currency: 'USD',
+                    symbol: currentSymbol,
+                    duration: 1,
+                    duration_unit: 't',
+                    contract_type: type === 'EVEN' ? 'DIGITEVEN' : 'DIGITODD'
+                }));
+
+                // Aguarda resposta de proposta e executa buy
+                const handleOrderResponse = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if(data.msg_type === 'proposal') {
+                            ws.send(JSON.stringify({ buy: data.proposal.id, price: currentStake }));
+                        } else if(data.msg_type === 'buy') {
+                            ws.removeEventListener('message', handleOrderResponse);
+                            showNotification('Contrato Comprado', `ID: ${data.buy.contract_id}`, 'success');
+                            addTradeLog(`Contrato ID ${data.buy.contract_id} aberto com sucesso.`, 'success');
+                            activeTradeLock = false;
+                        } else if(data.error) {
+                            ws.removeEventListener('message', handleOrderResponse);
+                            showNotification('Erro na Ordem', data.error.message, 'error');
+                            addTradeLog(`Erro API: ${data.error.message}`, 'error');
+                            activeTradeLock = false;
+                        }
+                    } catch(err) {}
+                };
+                ws.addEventListener('message', handleOrderResponse);
             } else {
                 simulateLocalTrade(type, currentStake, maxGales);
             }
