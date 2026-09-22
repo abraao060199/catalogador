@@ -158,7 +158,6 @@
     </div>
   </div>
 
-  <!-- PAINEL DE OPERAÇÕES REAL-TIME -->
   <div id="trade-panel">
     <div class="trade-row">
       <div class="trade-input-group">
@@ -210,7 +209,6 @@
   </div>
 
   <div id="cataloger-panel">
-    
     <div class="signal-card" id="signalCard">
       <div>
         <div class="signal-status" id="signalStatus">Aguardando Padrão...</div>
@@ -328,7 +326,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <div id="viewport-wrapper">
@@ -347,9 +344,10 @@
 
   <script>
     // ==========================================
-    // APP ID DA DERIV REGISTRADO
+    // APP ID DA DERIV (Deve ser estritamente numérico)
+    // Se preferir testar direto, use o ID público '1089'
     // ==========================================
-    const MY_APP_ID = "34tgDM9FOsSew19SzpAhP";[cite: 15]
+    const MY_APP_ID = "1089"; 
 
     const statusBar = document.getElementById("status-bar");
     const liveRowEl = document.getElementById("live-row");
@@ -376,7 +374,6 @@
     let authToken = null;
     let syncTimer = null;
 
-    // CAPTURA O TOKEN DA URL APÓS O LOGIN NA DERIV
     function getOAuthTokenFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       const token1 = urlParams.get('token1');
@@ -388,15 +385,14 @@
       return localStorage.getItem('deriv_token');
     }
 
-    // DISPARA O LOGIN NA DERIV COM A ESTRUTURA CORRETA DE REDIRECT URI
     function loginDeriv() {
+      // Garante que o redirecionamento usa HTTP/HTTPS e limpa parâmetros antigos
       const currentUrl = window.location.href.split('?')[0].split('#')[0];
       const encodedRedirectUrl = encodeURIComponent(currentUrl);
       const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${MY_APP_ID}&l=pt&redirect_uri=${encodedRedirectUrl}`;
       window.location.href = oauthUrl;
     }
 
-    // ALTERNA ENTRE OS ÍNDICES R100, R75, R50, R25 e R10
     function trocarSimbolo() {
       const novoSimbolo = document.getElementById("trade-symbol").value;
       SYMBOL = novoSimbolo;
@@ -426,7 +422,6 @@
       }
     }
 
-    // LÓGICA PARA ENTRADA INSTANTÂNEA OU SINCRONIZADA PELO TEMPO
     function prepararEntrada(contractType) {
       const timingSecs = parseInt(document.getElementById('trade-timing').value);
 
