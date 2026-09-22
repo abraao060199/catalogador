@@ -364,7 +364,7 @@
             </div>
 
             <p class="text-xs text-slate-400 mb-4">
-                Utilize o endpoint público oficial de opções da Deriv ou o servidor padrão. Caso sua rede bloqueie WebSockets externos, use o <b>Modo Sim</b>.
+                Configure o App ID e o endpoint WebSocket oficial da Deriv.
             </p>
 
             <div class="space-y-4">
@@ -374,10 +374,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Servidor WebSocket (Options Public)</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Servidor WebSocket</label>
                     <select id="config-endpoint" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500">
-                        <option value="wss://api.derivws.com/trading/v1/options/ws/public" selected>Deriv Options Public (api.derivws.com)</option>
-                        <option value="wss://ws.derivws.com/websockets/v3">Deriv Standard (ws.derivws.com)</option>
+                        <option value="wss://ws.derivws.com/websockets/v3" selected>Deriv Standard (ws.derivws.com)</option>
                         <option value="wss://ws.binaryws.com/websockets/v3">Binary Secondary (ws.binaryws.com)</option>
                     </select>
                 </div>
@@ -412,7 +411,7 @@
         let ws = null;
         let appId = '1089';
         let apiToken = '';
-        let currentEndpoint = 'wss://api.derivws.com/trading/v1/options/ws/public';
+        let currentEndpoint = 'wss://ws.derivws.com/websockets/v3';
         let currentSymbol = 'R_100';
         let isConnected = false;
         let simInterval = null;
@@ -565,7 +564,7 @@
                     const pipSize = 2;
                     processTick({
                         quote: currentSimPrice,
-                        pip_symbol: currentSymbol,
+                        symbol: currentSymbol,
                         pip_size: pipSize
                     });
                 }, 1000);
@@ -585,20 +584,18 @@
             currentSymbol = document.getElementById('symbol-select').value;
             
             let wsUrl = currentEndpoint;
-            // Se for endpoint options/ws/public, não requer query param app_id na URL
-            if(!wsUrl.includes('trading/v1/options/ws/public')) {
-                if(!wsUrl.includes('?')) {
-                    wsUrl += `?app_id=${appId}`;
-                } else if(!wsUrl.includes('app_id=')) {
-                    wsUrl += `&app_id=${appId}`;
-                }
+            if(!wsUrl.includes('?')) {
+                wsUrl += `?app_id=${appId}`;
+            } else if(!wsUrl.includes('app_id=')) {
+                wsUrl += `&app_id=${appId}`;
             }
             
             try {
                 ws = new WebSocket(wsUrl);
             } catch(e) {
                 console.error('WebSocket Exception:', e);
-                tryFallbackWebSocket();
+                statusEl.innerText = 'Falha na Conexão';
+                showNotification('Erro', 'Não foi possível iniciar o WebSocket.', 'error');
                 return;
             }
 
@@ -613,19 +610,8 @@
                 showNotification('Conexão Estabelecida', `Conectado com sucesso ao servidor Deriv`, 'success');
                 addTradeLog(`Conectado ao ativo ${currentSymbol}`, 'info');
 
-                // Handshake obrigatório para options/ws/public
-                if(wsUrl.includes('trading/v1/options/ws/public')) {
-                    ws.send(JSON.stringify({ "ws_public": 1 }));
-                }
-
-                // Subscrição de tick (suporta tanto o formato padrão quanto o novo underlying_symbol)
-                setTimeout(() => {
-                    if(wsUrl.includes('trading/v1/options/ws/public')) {
-                        ws.send(JSON.stringify({ ticks: currentSymbol, underlying_symbol: currentSymbol, subscribe: 1 }));
-                    } else {
-                        ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
-                    }
-                }, 300);
+                // Enviar subscrição de tick padrão Deriv API v3
+                ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
             };
 
             ws.onmessage = function(event) {
@@ -635,12 +621,6 @@
                         processTick(data.tick);
                     } else if(data.tick) {
                         processTick(data.tick);
-                    } else if(data.quote) {
-                        processTick({
-                            quote: data.quote,
-                            pip_symbol: data.underlying_symbol || currentSymbol,
-                            pip_size: data.pip_size || 2
-                        });
                     }
                 } catch(err) {
                     console.error('Erro ao processar mensagem do WS:', err);
@@ -649,7 +629,8 @@
 
             ws.onerror = function(error) {
                 console.error('WebSocket Error:', error);
-                tryFallbackWebSocket();
+                statusEl.innerText = 'Erro na Conexão';
+                showNotification('Erro WebSocket', 'Falha na comunicação com o servidor.', 'error');
             };
 
             ws.onclose = function() {
@@ -658,52 +639,6 @@
                 }
             };
         };
-
-        function tryFallbackWebSocket() {
-            const statusEl = document.getElementById('status-text');
-            statusEl.innerText = 'Tentando Fallback...';
-            
-            const fallbackUrl = `wss://ws.derivws.com/websockets/v3?app_id=${appId}`;
-            try {
-                ws = new WebSocket(fallbackUrl);
-            } catch(e) {
-                statusEl.innerText = 'Falha na Conexão';
-                showNotification('Erro de Conexão', 'Não foi possível conectar via WebSocket. Ative o [Modo Sim] para operar imediatamente.', 'error');
-                addTradeLog('Falha ao conectar via WebSocket. Sugerido Modo Simulador.', 'error');
-                return;
-            }
-
-            ws.onopen = function() {
-                isConnected = true;
-                document.getElementById('status-text').innerText = 'Conectado (Std)';
-                document.getElementById('status-text').className = 'text-emerald-400';
-                document.querySelector('#connection-status span').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
-                document.getElementById('connect-btn-text').innerText = 'Desconectar';
-                showNotification('Conexão Padrão', 'Conectado com sucesso via servidor padrão Deriv.', 'success');
-                addTradeLog(`Conectado ao ativo ${currentSymbol} (servidor padrão)`, 'info');
-
-                ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
-            };
-
-            ws.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                if(data.msg_type === 'tick' && data.tick) {
-                    processTick(data.tick);
-                } else if(data.tick) {
-                    processTick(data.tick);
-                }
-            };
-
-            ws.onerror = function() {
-                document.getElementById('status-text').innerText = 'Falha na Conexão';
-                showNotification('Erro de Conexão', 'Rede bloqueou WebSockets. Ative o [Modo Sim] para testar todas as análises.', 'error');
-                addTradeLog('Erro crítico de WebSocket. Ative o Modo Sim.', 'error');
-            };
-
-            ws.onclose = function() {
-                if(isConnected) disconnectWS(false);
-            };
-        }
 
         function disconnectWS(notify = true) {
             if(ws) {
@@ -896,12 +831,11 @@
 
             if(mode === 'real' && !isSimulating) {
                 if(!ws || !isConnected) {
-                    showNotification('Erro', 'Conecte-se à API WebSocket primeiro ou ative o Modo Sim.', 'error');
+                    showNotification('Erro', 'Conecte-se à API WebSocket primeiro.', 'error');
                     activeTradeLock = false;
                     return;
                 }
                 
-                // Exemplo de requisição de compra proposal/buy na API Deriv
                 ws.send(JSON.stringify({
                     proposal: 1,
                     amount: currentStake,
@@ -913,7 +847,6 @@
                     contract_type: type === 'EVEN' ? 'DIGITEVEN' : 'DIGITODD'
                 }));
 
-                // Aguarda resposta de proposta e executa buy
                 const handleOrderResponse = (event) => {
                     try {
                         const data = JSON.parse(event.data);
