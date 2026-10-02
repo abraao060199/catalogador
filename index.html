@@ -1,929 +1,1311 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deriv Odd/Even Pro & Advanced Bot Trader</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        deriv: {
-                            dark: '#0e1726',
-                            card: '#1b2a4a',
-                            border: '#2c3e50',
-                            accent: '#ff444f',
-                            even: '#3b82f6',
-                            odd: '#ec4899'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .pulse-glow { animation: pulseGlow 1.5s infinite; }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(236, 72, 153, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogador Double Dolar + Auto Trade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-body: #0b0f19;
+      --bg-surface: #111827;
+      --bg-surface-hover: #1f2937;
+      --bg-card: #141c2b;
+      --border-color: #1f2937;
+      --border-light: rgba(255, 255, 255, 0.05);
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-green-hover: #059669;
+      --accent-red: #ef4444;
+      --accent-purple: #8b5cf6;
+      --accent-yellow: #f59e0b;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-glow-blue: 0 0 15px rgba(59, 130, 246, 0.3);
+      --shadow-glow-green: 0 0 15px rgba(16, 185, 129, 0.3);
+      --shadow-glow-red: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+      overflow-y: auto;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-body); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    .app-container {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .top-header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .top-header h1 { 
+      font-size: 15px; 
+      font-weight: 800; 
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    
+    #digital-clock {
+      font-family: monospace; font-size: 14px; font-weight: 700; color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); 
+      padding: 6px 12px; border-radius: 8px; letter-spacing: 1px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; 
+      cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .btn-refresh { background-color: var(--bg-surface-hover); color: var(--text-main); border-color: var(--border-color); }
+    .btn-refresh:hover { background-color: var(--border-color); }
+    
+    .btn-catalog { background-color: var(--accent-green); color: #fff; box-shadow: var(--shadow-glow-green); }
+    .btn-catalog:hover { background-color: var(--accent-green-hover); transform: translateY(-1px); }
+
+    .btn-action { background-color: var(--accent-blue); color: white; width: 100%; box-shadow: var(--shadow-glow-blue); font-size: 13px; padding: 10px; }
+    .btn-action:hover { background-color: var(--accent-blue-hover); }
+
+    #status-bar { 
+      font-size: 11px; padding: 6px 12px; border-radius: 999px; font-weight: 600; 
+      background: var(--bg-surface-hover); color: var(--accent-yellow); 
+      display: flex; align-items: center; gap: 6px;
+    }
+    #status-bar::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    #status-bar.connected { color: var(--accent-green); }
+    #status-bar.error { color: var(--accent-red); }
+
+    .help-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--border-color); color: var(--text-muted);
+      font-size: 11px; font-weight: 800; cursor: help; margin-left: 6px;
+      position: relative; transition: all 0.2s ease;
+    }
+    .help-icon:hover { background: var(--accent-blue); color: #fff; }
+    
+    .help-icon[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute; bottom: 150%; left: 50%; transform: translateX(-50%) translateY(4px);
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 8px 12px; border-radius: 6px;
+      font-size: 11px; white-space: normal; width: max-content; max-width: 250px;
+      box-shadow: var(--shadow-lg); z-index: 50; text-transform: none; font-weight: 500;
+      opacity: 0; visibility: hidden; transition: all 0.2s ease; text-align: left;
+      pointer-events: none;
+    }
+    .help-icon[data-tooltip]:hover::after {
+      opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+    }
+
+    #cataloger-panel {
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 20px; display: none;
+      grid-template-columns: 1fr 1fr; gap: 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    #cataloger-panel.active { display: grid; }
+    
+    .panel-section {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    }
+    
+    .panel-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { display: flex; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    select { 
+      width: 100%; background: var(--bg-body); border: 1px solid var(--border-color); 
+      color: var(--text-main); padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 500;
+      outline: none; transition: border 0.2s; cursor: pointer;
+    }
+    select:focus { border-color: var(--accent-blue); }
+
+    .grid-3-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .custom-builder-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: center;
+    }
+    .btn-purple { background: var(--accent-purple); color: white; padding: 10px 14px; }
+    .btn-purple:hover { background: #7c3aed; }
+    
+    .btn-green { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .btn-green:hover { background: var(--accent-green); color: white; }
+    .btn-red { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
+    .btn-red:hover { background: var(--accent-red); color: white; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg-surface-hover); }
+
+    .btn-group-cat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+    .builder-display {
+      min-height: 50px; background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color);
+      border-radius: 8px; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+
+    .chip {
+      padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 11px;
+      cursor: pointer; display: flex; align-items: center; gap: 8px; background: var(--bg-surface-hover); border: 1px solid var(--border-color);
+      transition: transform 0.1s;
+    }
+    .chip:hover { transform: scale(1.05); }
+    .chip.combo { background: rgba(139, 92, 246, 0.15); color: #d8b4fe; border-color: var(--accent-purple); }
+    .chip.up { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.3); }
+    .chip.down { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border-color: rgba(239, 68, 68, 0.3); }
+    .chip.even { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+    .chip.odd { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); }
+
+    .dual-results { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    
+    .result-box { 
+      background: var(--bg-card); border: 1px solid var(--border-color); 
+      padding: 16px; border-radius: 12px; transition: all 0.3s;
+    }
+    .result-title { 
+      font-size: 13px; font-weight: 800; text-align: center; padding-bottom: 12px; 
+      border-bottom: 1px solid var(--border-light); margin-bottom: 12px; text-transform: uppercase;
+    }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .stat-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); padding: 10px; border-radius: 8px; text-align: center; }
+    .stat-card .num { font-size: 14px; font-weight: 800; margin-top: 4px; font-family: monospace; }
+    .stat-card .lbl { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+    #col-ranking-panel {
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 20px;
+    }
+    .col-rank-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-top: 12px; }
+
+    #viewport-wrapper {
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 16px; overflow-x: auto; box-shadow: var(--shadow-sm);
+    }
+    
+    .table-container { width: 100%; min-width: 1200px; display: flex; flex-direction: column; gap: 8px; }
+    .row-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; width: 100%; }
+    
+    .col-header { 
+      background-color: var(--bg-card); color: var(--text-muted); 
+      font-size: 13px; font-weight: 800; text-align: center; padding: 8px 0; 
+      border-radius: 6px; border: 1px solid var(--border-light);
+    }
+
+    .live-container { 
+      background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); 
+      border-radius: 8px; padding: 10px; position: relative;
+    }
+    .live-title { 
+      font-size: 10px; color: var(--accent-blue); font-weight: 700; 
+      text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;
+    }
+    .live-title::before { content: ''; width: 6px; height: 6px; background: var(--accent-blue); border-radius: 50%; animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+    
+    #history-container { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+    .round-box { 
+      background: var(--bg-card); border: 1px solid var(--border-light); 
+      border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; width: 100%; 
+    }
+    .round-stones { display: flex; justify-content: space-between; gap: 4px; }
+    
+    .stone {
+      flex: 1; height: 42px; background-color: var(--bg-surface-hover); border-radius: 6px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; transition: all 0.2s ease; border: 1px solid transparent;
+    }
+    
+    .stone.highlight-pattern { border-color: var(--accent-yellow) !important; box-shadow: inset 0 0 10px rgba(245, 158, 11, 0.2); z-index: 2; }
+    .stone.win-pattern { border-color: var(--accent-green) !important; background-color: rgba(16, 185, 129, 0.1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); z-index: 3; }
+    .stone.loss-pattern { border-color: var(--accent-red) !important; background-color: rgba(239, 68, 68, 0.1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); z-index: 3; }
+
+    .circle { 
+      width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; 
+      justify-content: center; font-size: 11px; font-weight: 800; color: #ffffff; 
+    }
+    .odd .circle { background-color: var(--accent-red); box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4); }
+    .even .circle { background-color: var(--accent-blue); box-shadow: 0 2px 4px rgba(59, 130, 246, 0.4); }
+    .empty .circle { background-color: transparent; border: 1px dashed var(--text-muted); color: var(--text-muted); box-shadow: none; }
+    
+    .arrow { font-size: 9px; font-weight: 900; line-height: 1; margin-top: 2px; }
+    .arrow.up { color: var(--accent-green); }
+    .arrow.down { color: var(--accent-red); }
+    
+    .time-bar { 
+      background-color: var(--bg-surface); color: var(--text-muted); font-size: 10px; 
+      font-weight: 600; text-align: center; padding: 3px 0; border-radius: 4px; font-family: monospace; 
+    }
+
+    /* ESTILOS DO PAINEL DE TRADE EMBUTIDO */
+    .trade-input {
+      background: var(--bg-body); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 10px; border-radius: 6px;
+      font-size: 14px; outline: none; width: 100%; margin-bottom: 12px;
+    }
+    .trade-input:focus { border-color: var(--accent-blue); }
+
+    .trade-panel {
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 16px; width: 100%; max-width: 400px;
+      box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 16px;
+    }
+    .account-header {
+      background: var(--bg-card); padding: 12px; border-radius: 8px;
+      border: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 12px;
+    }
+    .account-select-row { display: flex; gap: 8px; }
+    .btn-power {
+      background: var(--accent-red); color: white; border: none;
+      border-radius: 6px; width: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-power:hover { background: #b91c1c; }
+    
+    .balances-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; }
+    .balance-val { color: var(--accent-green); font-size: 14px; margin-left: 4px; }
+
+    .trade-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
+    .trade-tab {
+      flex: 1; text-align: center; padding: 8px; font-size: 12px;
+      font-weight: 600; color: var(--text-muted); cursor: pointer;
+      border-bottom: 2px solid transparent; transition: 0.2s;
+    }
+    .trade-tab:hover { color: var(--text-main); }
+    .trade-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+
+    .input-row { display: flex; flex-direction: column; gap: 4px; }
+    .input-row label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .gale-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+    .btn-math { background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; width: 40px; cursor: pointer; font-size: 16px; }
+    .btn-math:hover { background: var(--bg-surface-hover); }
+
+    .choice-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; position: relative; margin-top: 8px; }
+    .choice-title { position: absolute; top: -8px; left: 12px; background: var(--bg-surface); padding: 0 4px; font-size: 10px; color: var(--text-muted); }
+    .btn-choice { flex: 1; padding: 12px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; color: white; opacity: 0.5; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px; }
+    .btn-choice.active { opacity: 1; box-shadow: var(--shadow-md); transform: scale(1.02); }
+    .btn-choice.par { background: var(--accent-green); }
+    .btn-choice.impar { background: var(--bg-surface-hover); border: 1px solid var(--border-color); }
+    
+    .top-panels-wrapper { display: flex; gap: 16px; width: 100%; align-items: flex-start; }
+    .top-panels-wrapper > div:first-child { flex: 1; }
+  </style>
 </head>
-<body class="bg-deriv-dark text-slate-100 min-h-screen flex flex-col selection:bg-pink-500 selection:text-white">
+<body>
 
-    <header class="bg-deriv-card border-b border-deriv-border px-6 py-4 flex flex-wrap items-center justify-between shadow-md">
-        <div class="flex items-center space-x-3">
-            <div class="bg-gradient-to-r from-pink-500 to-blue-500 p-2.5 rounded-xl shadow-lg">
-                <i class="fa-solid fa-chart-line text-white text-xl"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent">Deriv Odd/Even Pro</h1>
-                <p class="text-xs text-slate-400">Análise de Dígitos & Sistema Avançado de Entradas</p>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-4 mt-3 sm:mt-0">
-            <div id="connection-status" class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                <span id="status-text" class="text-amber-400">Desconectado</span>
-            </div>
-            <button onclick="toggleModal('config-modal')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center space-x-2">
-                <i class="fa-solid fa-gear text-slate-300"></i>
-                <span>Configurações API</span>
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Left Column: Controls & Live Feed -->
-        <div class="space-y-6 flex flex-col">
-            
-            <!-- Asset & Connection Card -->
-            <div class="bg-deriv-card rounded-2xl border border-deriv-border p-5 shadow-xl">
-                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
-                    <span>Configuração do Ativo</span>
-                    <i class="fa-solid fa-sliders text-pink-400"></i>
-                </h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Mercado / Sintético</label>
-                        <select id="symbol-select" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition">
-                            <option value="R_10">Volatility 10 Index</option>
-                            <option value="R_25">Volatility 25 Index</option>
-                            <option value="R_50">Volatility 50 Index</option>
-                            <option value="R_75">Volatility 75 Index</option>
-                            <option value="R_100" selected>Volatility 100 Index</option>
-                            <option value="1HZ10V">Volatility 10 (1s) Index</option>
-                            <option value="1HZ25V">Volatility 25 (1s) Index</option>
-                            <option value="1HZ50V">Volatility 50 (1s) Index</option>
-                            <option value="1HZ75V">Volatility 75 (1s) Index</option>
-                            <option value="1HZ100V">Volatility 100 (1s) Index</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="connect-btn" onclick="toggleConnection()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-plug"></i>
-                            <span id="connect-btn-text">Conectar API</span>
-                        </button>
-                        <button id="sim-btn" onclick="toggleSimulator()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-play"></i>
-                            <span id="sim-btn-text">Modo Sim</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Live Tick Visualizer Card -->
-            <div class="bg-deriv-card rounded-2xl border border-deriv-border p-5 shadow-xl flex-1 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3 flex items-center justify-between">
-                        <span>Último Tick Recebido</span>
-                        <i class="fa-solid fa-bolt text-amber-400"></i>
-                    </h2>
-                    
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center relative overflow-hidden">
-                        <div id="price-display" class="text-2xl font-mono font-bold tracking-tight text-slate-200">0.00000</div>
-                        <div id="price-direction" class="text-xs font-semibold mt-1 text-slate-500">Aguardando dados...</div>
-                        
-                        <!-- Big Digit Badge -->
-                        <div class="mt-4 flex items-center justify-center">
-                            <div id="last-digit-box" class="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-3xl font-black shadow-inner transition-all duration-300">
-                                -
-                            </div>
-                        </div>
-                        <div id="digit-type-badge" class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-800 text-slate-400">
-                            -
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Digits History Bar -->
-                <div class="mt-5">
-                    <span class="text-xs font-medium text-slate-400 block mb-2">Últimos 15 Dígitos (Esq = Mais Recente)</span>
-                    <div id="recent-digits-list" class="flex space-x-1.5 overflow-x-auto pb-1">
-                        <span class="text-xs text-slate-500 italic">Nenhum histórico ainda.</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Right Column: Statistics & Advanced Trading Management Panel -->
-        <div class="lg:col-span-2 space-y-6 flex flex-col">
-            
-            <!-- Analytics & Percentage Stats Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <!-- Even vs Odd Ratio -->
-                <div class="bg-deriv-card rounded-2xl border border-deriv-border p-4 shadow-xl flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
-                        <span>PAR vs ÍMPAR</span>
-                        <span id="total-ticks-count">0 Ticks</span>
-                    </div>
-                    <div class="flex items-center justify-between my-2">
-                        <div class="text-center flex-1">
-                            <span class="text-xs text-blue-400 font-semibold block">PAR (Even)</span>
-                            <span id="even-percent" class="text-xl font-bold text-blue-400">50.0%</span>
-                        </div>
-                        <div class="h-8 w-px bg-slate-700 mx-2"></div>
-                        <div class="text-center flex-1">
-                            <span class="text-xs text-pink-400 font-semibold block">ÍMPAR (Odd)</span>
-                            <span id="odd-percent" class="text-xl font-bold text-pink-400">50.0%</span>
-                        </div>
-                    </div>
-                    <!-- Progress bar -->
-                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex">
-                        <div id="even-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 50%;"></div>
-                        <div id="odd-bar" class="bg-pink-500 h-full transition-all duration-300" style="width: 50%;"></div>
-                    </div>
-                </div>
-
-                <!-- Streak Tracker -->
-                <div class="bg-deriv-card rounded-2xl border border-deriv-border p-4 shadow-xl flex flex-col justify-between">
-                    <span class="text-xs font-semibold text-slate-400 block mb-2">Sequência Atual (Streak)</span>
-                    <div class="text-center my-auto">
-                        <div id="current-streak-type" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Nenhuma</div>
-                        <div id="current-streak-count" class="text-3xl font-black text-slate-100">0</div>
-                    </div>
-                    <span class="text-[10px] text-slate-500 text-center block mt-1">Contínuas do mesmo tipo</span>
-                </div>
-
-                <!-- Max Consecutive -->
-                <div class="bg-deriv-card rounded-2xl border border-deriv-border p-4 shadow-xl flex flex-col justify-between">
-                    <span class="text-xs font-semibold text-slate-400 block mb-2">Máximo Sequencial</span>
-                    <div class="flex justify-around items-center my-auto">
-                        <div class="text-center">
-                            <span class="text-[10px] text-blue-400 block font-semibold">Máx Par</span>
-                            <span id="max-even-streak" class="text-xl font-bold text-blue-400">0</span>
-                        </div>
-                        <div class="h-8 w-px bg-slate-700"></div>
-                        <div class="text-center">
-                            <span class="text-[10px] text-pink-400 block font-semibold">Máx Ímpar</span>
-                            <span id="max-odd-streak" class="text-xl font-bold text-pink-400">0</span>
-                        </div>
-                    </div>
-                    <span class="text-[10px] text-slate-500 text-center block mt-1">Registrados na sessão</span>
-                </div>
-            </div>
-
-            <!-- Digit Frequency Distribution Chart/Bars -->
-            <div class="bg-deriv-card rounded-2xl border border-deriv-border p-5 shadow-xl">
-                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
-                    <span>Distribuição de Frequência por Dígito (0 a 9)</span>
-                    <span id="sample-size-text" class="text-xs text-slate-400 font-normal">Amostra: 0 ticks</span>
-                </h2>
-                
-                <div class="grid grid-cols-5 sm:grid-cols-10 gap-2" id="digit-freq-container">
-                    <!-- Gerado via JS -->
-                </div>
-            </div>
-
-            <!-- Advanced Trading Management Panel -->
-            <div class="bg-deriv-card rounded-2xl border border-deriv-border p-5 shadow-xl flex-1 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-                            <span>Gerenciamento de Entradas & Bot Automático</span>
-                            <i class="fa-solid fa-robot text-emerald-400"></i>
-                        </h2>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center space-x-1 bg-slate-900 px-2.5 py-1 rounded-lg border border-deriv-border">
-                                <span class="text-[10px] text-slate-400">Modo:</span>
-                                <select id="exec-mode" class="bg-transparent text-xs text-slate-200 focus:outline-none">
-                                    <option value="sim">Simulação (Local)</option>
-                                    <option value="real">Real / Demo (API Token)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stake & Martingale Settings Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Stake Inicial ($)</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 text-xs">$</span>
-                                <input type="number" id="stake-input" value="1.00" min="0.35" step="0.1" class="w-full bg-slate-900 border border-deriv-border rounded-xl pl-7 pr-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Multiplicador Martingale</label>
-                            <input type="number" id="martingale-input" value="2.0" min="1.0" step="0.1" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Máx. Gales Sequenciais</label>
-                            <input type="number" id="max-martingale-input" value="5" min="0" max="10" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 transition">
-                        </div>
-                    </div>
-
-                    <!-- Risk Management (Take Profit / Stop Loss) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800">
-                        <div>
-                            <label class="block text-[11px] font-medium text-emerald-400 mb-1">Take Profit (Meta de Lucro $)</label>
-                            <input type="number" id="take-profit-input" value="10.00" min="1.0" step="1.0" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-emerald-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-rose-400 mb-1">Stop Loss (Limite de Perda $)</label>
-                            <input type="number" id="stop-loss-input" value="20.00" min="1.0" step="1.0" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-rose-500 transition">
-                        </div>
-                    </div>
-
-                    <!-- Auto Bot Strategy Trigger Settings -->
-                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
-                                <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i>
-                                <span>Gatilho de Entrada Automática (Bot Strategist)</span>
-                            </span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="auto-bot-toggle" class="sr-only peer">
-                                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
-                            </label>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <label class="block text-[10px] text-slate-400 mb-1">Entrar após streak de:</label>
-                                <select id="bot-strategy-trigger" class="w-full bg-slate-900 border border-deriv-border rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
-                                    <option value="3">3 repetições seguidas</option>
-                                    <option value="4">4 repetições seguidas</option>
-                                    <option value="5" selected>5 repetições seguidas</option>
-                                    <option value="6">6 repetições seguidas</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-slate-400 mb-1">Aposta Automática em:</label>
-                                <select id="bot-strategy-action" class="w-full bg-slate-900 border border-deriv-border rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
-                                    <option value="REVERSE">Entrar no Reverso (Quebra de Streak)</option>
-                                    <option value="FOLLOW">Seguir a Tendência (Continuar Streak)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Manual Action Buttons -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="executeTrade('EVEN')" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 transition flex flex-col items-center justify-center space-y-0.5">
-                            <span class="text-sm tracking-wide flex items-center space-x-2">
-                                <i class="fa-solid fa-arrow-down-up-across-line"></i>
-                                <span>ENTRAR PAR (EVEN)</span>
-                            </span>
-                            <span class="text-[9px] text-blue-200 font-normal">Dígitos 0, 2, 4, 6, 8</span>
-                        </button>
-
-                        <button onclick="executeTrade('ODD')" class="bg-pink-600 hover:bg-pink-500 active:bg-pink-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-pink-600/30 transition flex flex-col items-center justify-center space-y-0.5">
-                            <span class="text-sm tracking-wide flex items-center space-x-2">
-                                <i class="fa-solid fa-arrows-split-up-and-left"></i>
-                                <span>ENTRAR ÍMPAR (ODD)</span>
-                            </span>
-                            <span class="text-[9px] text-pink-200 font-normal">Dígitos 1, 3, 5, 7, 9</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-5 pt-4 border-t border-deriv-border">
-                    <div class="flex items-center justify-between text-xs mb-3">
-                        <div class="flex items-center space-x-4">
-                            <div>
-                                <span class="text-slate-400 block text-[10px]">Operações:</span>
-                                <span id="stat-total-trades" class="font-bold text-slate-200">0</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[10px]">Wins:</span>
-                                <span id="stat-wins" class="font-bold text-emerald-400">0</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[10px]">Losses:</span>
-                                <span id="stat-losses" class="font-bold text-rose-400">0</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[10px]">Nível Gale:</span>
-                                <span id="stat-current-gale" class="font-bold text-amber-400">0</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-slate-400 block text-[10px]">Resultado da Sessão (P/L)</span>
-                            <span id="session-pl" class="font-mono font-bold text-sm text-slate-200">$0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- Trade Activity Log Box -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 max-h-28 overflow-y-auto font-mono text-[11px]" id="trade-log-container">
-                        <div class="text-slate-500 italic">Logs de operação aparecerão aqui...</div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <!-- Config Modal -->
-    <div id="config-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-deriv-card border border-deriv-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
-                    <i class="fa-solid fa-gear text-pink-400"></i>
-                    <span>Credenciais da API Deriv</span>
-                </h3>
-                <button onclick="toggleModal('config-modal')" class="text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <p class="text-xs text-slate-400 mb-4">
-                Configure o App ID e o endpoint WebSocket oficial da Deriv.
-            </p>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">App ID</label>
-                    <input type="text" id="config-appid" value="1089" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Servidor WebSocket</label>
-                    <select id="config-endpoint" class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500">
-                        <option value="wss://ws.derivws.com/websockets/v3" selected>Deriv Standard (ws.derivws.com)</option>
-                        <option value="wss://ws.binaryws.com/websockets/v3">Binary Secondary (ws.binaryws.com)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">API Token (Opcional)</label>
-                    <input type="password" id="config-token" placeholder="Cole seu token aqui..." class="w-full bg-slate-900 border border-deriv-border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-pink-500">
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="toggleModal('config-modal')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs font-medium transition">
-                    Cancelar
-                </button>
-                <button onclick="saveConfig()" class="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white px-4 py-2 rounded-xl text-xs font-medium transition shadow-lg shadow-pink-600/25">
-                    Salvar & Reconectar
-                </button>
-            </div>
-        </div>
+  <div class="app-container">
+    
+    <div class="top-header">
+      <h1>Catalogador Double Dolar + Auto Trade</h1>
+      <div class="header-actions">
+        <div id="status-bar">Iniciando Servidor...</div>
+        <div id="digital-clock">00:00:00</div>
+        <button class="btn btn-refresh" onclick="refreshTicks()">↻ Reiniciar Data</button>
+        <button class="btn btn-catalog" onclick="toggleCataloger()">🎯 Abrir Setup</button>
+      </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="notification-box" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm w-full bg-slate-900 border border-slate-700 rounded-2xl p-4 shadow-2xl flex items-center space-x-3">
-        <div id="notif-icon" class="text-xl"></div>
-        <div class="flex-1">
-            <h4 id="notif-title" class="text-xs font-bold text-slate-200">Notificação</h4>
-            <p id="notif-desc" class="text-xs text-slate-400 mt-0.5">Mensagem...</p>
+    <!-- Wrapper para colocar o Construtor e o Painel de Trade lado a lado -->
+    <div class="top-panels-wrapper">
+      
+      <!-- Painel Original de Catalogação -->
+      <div id="cataloger-panel">
+        
+        <div class="panel-section">
+          <div class="panel-title">1. Configurações da Estratégia</div>
+          
+          <div class="input-group" style="margin-bottom: 8px;">
+            <label style="color: var(--accent-green);">
+              TIPO DE CATALOGAÇÃO (BASE):
+              <span class="help-icon" data-tooltip="Define se o sistema usará estratégias prontas automáticas ou um padrão livre montado por você.">?</span>
+            </label>
+            <select id="strategy_select" onchange="toggleStrategyMode()">
+              <option value="MANUAL">Construtor Manual de Padrões (Livre)</option>
+              <option value="STRAT_1">Pré-Set 1: 2 Ticks Mesma Direção + Mesma Cor (Aposta Mesma Cor)</option>
+              <option value="STRAT_2">Pré-Set 2: 2 Ticks Mesma Direção + Cores Diferentes (Aposta Menor)</option>
+            </select>
+          </div>
+
+          <div class="grid-3-col">
+            <div class="input-group">
+              <label>
+                Direção da Leitura:
+              </label>
+              <select id="analysis_mode" onchange="autoReCatalog()">
+                <option value="horizontal">Linha (Seq. Cruzada)</option>
+                <option value="vertical" selected>Coluna (Vertical)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>
+                Amostragem:
+              </label>
+              <select id="time_window" onchange="autoReCatalog()">
+                <option value="15">Últimos 15 Minutos</option>
+                <option value="30">Últimos 30 Minutos</option>
+                <option value="60">Última 1 Hora</option>
+                <option value="120">Últimas 2 Horas</option>
+                <option value="0" selected>Base Completa (Max)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>
+                Martingale:
+              </label>
+              <select id="gale-level" onchange="autoReCatalog()">
+                <option value="0">Zero Gale (Mão Fixa)</option>
+                <option value="1" selected>Até 1 Gale (G1)</option>
+                <option value="2">Até 2 Gales (G2)</option>
+              </select>
+            </div>
+          </div>
+          
+          <button class="btn btn-action" style="margin-top:auto;" onclick="autoReCatalog()">FORÇAR ATUALIZAÇÃO DOS DADOS</button>
         </div>
+
+        <div class="panel-section" id="manual-builder-panel">
+          <div class="panel-title" style="color: var(--accent-purple);">2. Construtor de Padrão Manual</div>
+          
+          <div class="input-group">
+            <label>
+              Montar bloco lógico (Combine):
+            </label>
+            <div class="custom-builder-row">
+              <select id="cb-digit">
+                <option value="">Digito (Opcional)</option>
+                <option value="0">Final 0</option><option value="1">Final 1</option><option value="2">Final 2</option>
+                <option value="3">Final 3</option><option value="4">Final 4</option><option value="5">Final 5</option>
+                <option value="6">Final 6</option><option value="7">Final 7</option><option value="8">Final 8</option>
+                <option value="9">Final 9</option>
+              </select>
+              <select id="cb-parity">
+                <option value="">Par/Ímpar (Opcional)</option>
+                <option value="PAR">Apenas PAR</option>
+                <option value="ÍMPAR">Apenas ÍMPAR</option>
+              </select>
+              <select id="cb-direction">
+                <option value="">Direção (Opcional)</option>
+                <option value="UP">Apenas ▲ UP</option>
+                <option value="DOWN">Apenas ▼ DOWN</option>
+              </select>
+              <button class="btn btn-purple" onclick="addCustomCombinedBlock()">+ Add</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>
+              Adição Rápida (Atalhos):
+            </label>
+            <div class="btn-group-cat">
+              <button class="btn btn-green" onclick="addBlock('UP')">▲ UP</button>
+              <button class="btn btn-red" onclick="addBlock('DOWN')">▼ DOWN</button>
+              <button class="btn btn-outline" style="border-color:var(--accent-blue); color:var(--accent-blue);" onclick="addBlock('PAR')">PAR</button>
+              <button class="btn btn-outline" style="border-color:var(--accent-yellow); color:var(--accent-yellow);" onclick="addBlock('ÍMPAR')">ÍMPAR</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Sequência do Gatilho Atual:</label>
+            <div id="patternDisplay" class="builder-display">
+              <span style="color:var(--text-muted); font-size:11px;">O padrão está vazio. Adicione blocos acima.</span>
+            </div>
+          </div>
+
+          <button class="btn btn-outline" style="width:100%; border-color:var(--border-color); color:var(--text-muted);" onclick="clearPattern()">Limpar Gatilho</button>
+        </div>
+
+        <div class="dual-results">
+          <div class="result-box" id="result-box-par" style="border-color: var(--accent-blue);">
+            <div class="result-title" id="par-title" style="color: var(--accent-blue);">Entrada Alvo: PAR</div>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="lbl">Assertividade</div><div class="num" id="par-rate" style="color:var(--accent-green)">0%</div></div>
+              <div class="stat-card"><div class="lbl">Qtd Entradas</div><div class="num" id="par-total">0</div></div>
+              <div class="stat-card"><div class="lbl">Win de 1ª (G0)</div><div class="num" id="par-win0" style="color:var(--accent-green)">0</div></div>
+              <div class="stat-card"><div class="lbl">Win no Gale</div><div class="num" id="par-wingale">0</div></div>
+              <div class="stat-card"><div class="lbl">Max Win Seg.</div><div class="num" id="par-max-wins" style="color:var(--accent-green)">0</div></div>
+              <div class="stat-card"><div class="lbl">Max Loss Seg.</div><div class="num" id="par-max-losses" style="color:var(--accent-red)">0</div></div>
+              <div class="stat-card" style="grid-column: span 2;"><div class="lbl">Espaçamento Médio entre Losses</div><div class="num" id="par-loss-gap" style="color:var(--accent-yellow)">--</div></div>
+            </div>
+          </div>
+
+          <div class="result-box" id="result-box-impar" style="border-color: var(--accent-yellow);">
+            <div class="result-title" id="impar-title" style="color: var(--accent-yellow);">Entrada Alvo: ÍMPAR</div>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="lbl">Assertividade</div><div class="num" id="impar-rate" style="color:var(--accent-green)">0%</div></div>
+              <div class="stat-card"><div class="lbl">Qtd Entradas</div><div class="num" id="impar-total">0</div></div>
+              <div class="stat-card"><div class="lbl">Win de 1ª (G0)</div><div class="num" id="impar-win0" style="color:var(--accent-green)">0</div></div>
+              <div class="stat-card"><div class="lbl">Win no Gale</div><div class="num" id="impar-wingale">0</div></div>
+              <div class="stat-card"><div class="lbl">Max Win Seg.</div><div class="num" id="impar-max-wins" style="color:var(--accent-green)">0</div></div>
+              <div class="stat-card"><div class="lbl">Max Loss Seg.</div><div class="num" id="impar-max-losses" style="color:var(--accent-red)">0</div></div>
+              <div class="stat-card" style="grid-column: span 2;"><div class="lbl">Espaçamento Médio entre Losses</div><div class="num" id="impar-loss-gap" style="color:var(--accent-yellow)">--</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Novo Painel de Trade (Fica sempre visível, alterna conteúdos) -->
+      <div class="trade-panel" id="trading-ui-panel">
+        
+        <!-- SECÇÃO 1: MODO DESLOGADO -->
+        <div id="trade-login-view" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 250px; text-align: center;">
+          <h3 style="margin-bottom: 8px; color: var(--accent-blue);">Auto Trade</h3>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
+            Conecte a sua conta da Deriv de forma segura para operar diretamente a partir deste painel.
+          </p>
+          <input type="text" id="oauth-client-id" class="trade-input" placeholder="O seu Client ID (OAuth)" style="margin-bottom: 16px;">
+          <button class="btn btn-action" onclick="startOAuthLogin()">Conectar com a Deriv</button>
+        </div>
+
+        <!-- SECÇÃO 2: MODO LOGADO -->
+        <div id="trade-controls-view" style="display: none; flex-direction: column; gap: 16px;">
+          <div class="account-header">
+            <label style="font-size: 11px; color: var(--text-muted);">Selecionar Conta</label>
+            <div class="account-select-row">
+              <select id="account-selector" style="flex: 1; padding: 8px; border-radius: 6px; background: var(--bg-body); color: white; border: 1px solid var(--border-color);" onchange="switchAccountOTP()">
+              </select>
+              <button class="btn-power" onclick="logoutDeriv()">⏻</button>
+            </div>
+            <div class="balances-row">
+              <div><span style="color:var(--text-main);">Saldo:</span><span class="balance-val" id="acc-balance">$ 0,00</span></div>
+              <div><span style="color:var(--text-main);">P/L:</span><span class="balance-val" id="acc-pl" style="color: var(--text-muted);">$ 0,00</span></div>
+            </div>
+          </div>
+
+          <div class="trade-tabs">
+            <div class="trade-tab active" id="tab-manual" onclick="switchTradeTab('manual')">Manual</div>
+            <div class="trade-tab" id="tab-robo" onclick="switchTradeTab('robo')">Robô</div>
+          </div>
+
+          <div class="input-row">
+            <label>Entrada (Stake)</label>
+            <input type="number" id="trade-stake" class="trade-input" value="0.35" step="0.01" style="margin-bottom: 0;">
+          </div>
+
+          <div class="input-row" style="margin-top: 4px;">
+            <label>Fator gale</label>
+            <div class="gale-row">
+              <input type="number" id="trade-gale" class="trade-input" value="2.2" step="0.1" style="margin-bottom: 0;">
+              <button class="btn-math" onclick="adjustGale('div')">÷</button>
+              <button class="btn-math" onclick="adjustGale('mult')">×</button>
+            </div>
+          </div>
+
+          <div class="choice-box">
+            <span class="choice-title">Escolha Par ou Ímpar</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-choice par active" id="btn-type-par" onclick="selectTradeType('PAR')">🎲 Par</button>
+              <button class="btn-choice impar" id="btn-type-impar" onclick="selectTradeType('IMPAR')">🎲 Ímpar</button>
+            </div>
+          </div>
+
+          <button class="btn btn-action" id="btn-execute-trade" onclick="executeTrade()" style="padding: 14px; font-size: 14px; margin-top: 4px;">Realizar entrada</button>
+        </div>
+      </div>
+      
+    </div> <!-- Fim Wrapper Top -->
+
+    <div id="col-ranking-panel">
+      <div class="panel-title" style="color: var(--accent-blue);">📊 Desempenho Isolado e Tendência por Coluna de Minuto</div>
+      <div class="col-rank-grid" id="col-ranking-grid">
+        <div style="text-align: center; color: var(--text-muted); font-size: 12px; grid-column: span 10; padding: 20px;">
+          Configure o catalogador no painel acima para calcular o ranking em tempo real.
+        </div>
+      </div>
     </div>
 
-    <script>
-        let ws = null;
-        let appId = '1089';
-        let apiToken = '';
-        let currentEndpoint = 'wss://ws.derivws.com/websockets/v3';
-        let currentSymbol = 'R_100';
-        let isConnected = false;
-        let simInterval = null;
-        let isSimulating = false;
-        let currentSimPrice = 1000.00000;
+    <div id="viewport-wrapper">
+      <div class="table-container">
+        <div class="row-grid">
+          <div class="col-header">Minuto 0</div><div class="col-header">Minuto 1</div><div class="col-header">Minuto 2</div><div class="col-header">Minuto 3</div><div class="col-header">Minuto 4</div>
+          <div class="col-header">Minuto 5</div><div class="col-header">Minuto 6</div><div class="col-header">Minuto 7</div><div class="col-header">Minuto 8</div><div class="col-header">Minuto 9</div>
+        </div>
         
-        // Analytics state
-        let tickHistory = [];
-        let digitCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let totalTicks = 0;
-        let evenCount = 0;
-        let oddCount = 0;
-        let currentStreakType = null;
-        let currentStreakCount = 0;
-        let maxEvenStreak = 0;
-        let maxOddStreak = 0;
+        <div class="live-container">
+          <div class="live-title">Linha em Formação (Ao Vivo)</div>
+          <div class="row-grid" id="live-row"></div>
+        </div>
+        
+        <div id="history-container"></div>
+      </div>
+    </div>
 
-        // Trading & Martingale state
-        let stats = {
-            total: 0,
-            wins: 0,
-            losses: 0,
-            pl: 0.0
-        };
-        let currentMartingaleStep = 0;
-        let activeTradeLock = false;
+  </div>
 
-        // Initialize frequency grid on load
-        window.onload = function() {
-            initFrequencyGrid();
-        };
+  <script>
+    // --- VARIÁVEIS ORIGINAIS DO CATALOGADOR ---
+    const statusBar = document.getElementById("status-bar");
+    const liveRowEl = document.getElementById("live-row");
+    const historyContainerEl = document.getElementById("history-container");
+    const clockEl = document.getElementById("digital-clock");
 
-        function initFrequencyGrid() {
-            const container = document.getElementById('digit-freq-container');
-            container.innerHTML = '';
-            for(let i=0; i<10; i++) {
-                const isEven = i % 2 === 0;
-                const colorClass = isEven ? 'text-blue-400 border-blue-900/50 bg-blue-950/20' : 'text-pink-400 border-pink-900/50 bg-pink-950/20';
-                
-                const div = document.createElement('div');
-                div.className = `border ${colorClass} rounded-xl p-2.5 text-center flex flex-col justify-between items-center`;
-                div.innerHTML = `
-                    <span class="text-xs font-bold">${i}</span>
-                    <span id="freq-count-${i}" class="text-lg font-black my-1">0</span>
-                    <span id="freq-pct-${i}" class="text-[10px] text-slate-400">0.0%</span>
-                `;
-                container.appendChild(div);
-            }
-        }
+    const SYMBOL = "R_100"; 
+    const TOTAL_HISTORIC_BATCHES = 6;
 
-        window.toggleModal = function(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.toggle('hidden');
-        };
+    let ws = null; 
+    let historyRows = [];
+    let globalLiveRow = createEmptyRow();
+    let currentTenMinBlock = null;
+    
+    let processedKeys = new Set();
+    let isHistoryLoaded = false;
+    let tempHistoryMap = {};
+    let lastPrice = null;
 
-        function showNotification(title, desc, type = 'info') {
-            const box = document.getElementById('notification-box');
-            const titleEl = document.getElementById('notif-title');
-            const descEl = document.getElementById('notif-desc');
-            const iconEl = document.getElementById('notif-icon');
+    let rawHistoricalTicks = [];
+    let globalTicksList = [];
+    let pattern = [];
+    
+    let highlightedEpochs = new Set();
+    let winEpochs = new Set();
+    let lossEpochs = new Set();
 
-            titleEl.innerText = title;
-            descEl.innerText = desc;
+    let historyRequestsCount = 0;
+    let oldestEpochReceived = "latest";
 
-            if(type === 'success') {
-                iconEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-            } else if(type === 'error') {
-                iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-400"></i>';
-            } else {
-                iconEl.innerHTML = '<i class="fa-solid fa-circle-info text-blue-400"></i>';
-            }
+    // --- VARIÁVEIS OAUTH 2.0 & TRADE ---
+    const OAUTH_AUTH_URL = 'https://auth.deriv.com/oauth2/auth';
+    const OAUTH_TOKEN_URL = 'https://auth.deriv.com/oauth2/token';
+    let oauthClientId = localStorage.getItem('deriv_oauth_client_id') || '';
+    const redirectUri = window.location.origin + window.location.pathname;
 
-            box.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                box.classList.add('translate-y-20', 'opacity-0');
-            }, 4000);
-        }
+    let derivAccessToken = '';
+    let accountsData = [];
+    let wsTrade = null; 
+    let currentTradeType = 'DIGITEVEN';
+    let isBotActive = false;
 
-        function addTradeLog(message, type = 'info') {
-            const logContainer = document.getElementById('trade-log-container');
-            if(logContainer.innerHTML.includes('Logs de operação')) {
-                logContainer.innerHTML = '';
-            }
-            const timeStr = new Date().toLocaleTimeString();
-            const colorClass = type === 'success' ? 'text-emerald-400' : (type === 'error' ? 'text-rose-400' : 'text-slate-300');
+    // --- FUNÇÕES OAUTH E API REST ---
+    async function startOAuthLogin() {
+      oauthClientId = document.getElementById('oauth-client-id').value.trim();
+      if (!oauthClientId) return alert('Por favor, insira o seu Client ID da Deriv.');
+      localStorage.setItem('deriv_oauth_client_id', oauthClientId);
+
+      const array = crypto.getRandomValues(new Uint8Array(64));
+      const codeVerifier = Array.from(array).map(v => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v % 66]).join('');
+      const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
+      const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const state = crypto.getRandomValues(new Uint8Array(16)).reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
+
+      sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+      sessionStorage.setItem('oauth_state', state);
+
+      const authUrl = `${OAUTH_AUTH_URL}?response_type=code&client_id=${oauthClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=trade+account_manage&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+      window.location.href = authUrl;
+    }
+
+    async function handleOAuthCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      const error = urlParams.get('error');
+
+      if (error) {
+        alert('Acesso negado ou erro no login: ' + error);
+        window.history.replaceState({}, document.title, redirectUri);
+        return;
+      }
+
+      if (code && state) {
+        const savedState = sessionStorage.getItem('oauth_state');
+        const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+        oauthClientId = localStorage.getItem('deriv_oauth_client_id');
+
+        if (state !== savedState) return alert('Erro de segurança: O State não coincide.');
+
+        try {
+          const bodyParams = new URLSearchParams();
+          bodyParams.append('grant_type', 'authorization_code');
+          bodyParams.append('client_id', oauthClientId);
+          bodyParams.append('code', code);
+          bodyParams.append('code_verifier', codeVerifier);
+          bodyParams.append('redirect_uri', redirectUri);
+
+          const response = await fetch(OAUTH_TOKEN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: bodyParams
+          });
+
+          const data = await response.json();
+
+          if (data.access_token) {
+            sessionStorage.removeItem('pkce_code_verifier');
+            sessionStorage.removeItem('oauth_state');
+            window.history.replaceState({}, document.title, redirectUri);
             
-            const div = document.createElement('div');
-            div.className = `${colorClass} py-0.5 border-b border-slate-800/40 text-[11px]`;
-            div.innerHTML = `<span class="text-slate-500">[${timeStr}]</span> ${message}`;
-            logContainer.prepend(div);
+            derivAccessToken = data.access_token;
+            
+            // Alterna a interface de deslogado para logado
+            document.getElementById('trade-login-view').style.display = 'none';
+            document.getElementById('trade-controls-view').style.display = 'flex';
+
+            fetchAccountsOAuth();
+          } else {
+            alert('Erro ao processar o Token: ' + JSON.stringify(data));
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Falha na comunicação com o servidor de Tokens OAuth (Possível bloqueio de CORS. A troca de token deve ocorrer num backend).');
         }
+      } else {
+        if(oauthClientId) document.getElementById('oauth-client-id').value = oauthClientId;
+      }
+    }
 
-        window.saveConfig = function() {
-            const appInput = document.getElementById('config-appid').value.trim();
-            const endpointInput = document.getElementById('config-endpoint').value;
-            const tokenInput = document.getElementById('config-token').value.trim();
-            if(appInput) appId = appInput;
-            if(endpointInput) currentEndpoint = endpointInput;
-            apiToken = tokenInput;
-            window.toggleModal('config-modal');
-            showNotification('Configurações Salvas', 'Reconectando à API com novos parâmetros...', 'success');
-            if(isConnected) {
-                disconnectWS();
-            }
-            window.connectWS();
-        };
-
-        window.toggleConnection = function() {
-            if(isSimulating) toggleSimulator();
-            if(isConnected) {
-                disconnectWS();
-            } else {
-                window.connectWS();
-            }
-        };
-
-        window.toggleSimulator = function() {
-            if(isConnected) disconnectWS(false);
-            
-            const statusEl = document.getElementById('status-text');
-            const indicatorEl = document.querySelector('#connection-status span');
-            const simBtnText = document.getElementById('sim-btn-text');
-            const simBtn = document.getElementById('sim-btn');
-
-            if(isSimulating) {
-                clearInterval(simInterval);
-                isSimulating = false;
-                statusEl.innerText = 'Desconectado';
-                statusEl.className = 'text-amber-400';
-                indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-                simBtnText.innerText = 'Modo Sim';
-                simBtn.className = 'w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-1.5';
-                showNotification('Simulador', 'Simulador pausado.', 'info');
-                addTradeLog('Simulador pausado.', 'error');
-            } else {
-                isSimulating = true;
-                statusEl.innerText = 'Simulador Ativo';
-                statusEl.className = 'text-emerald-400';
-                indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
-                simBtnText.innerText = 'Parar Sim';
-                simBtn.className = 'w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-rose-600/20 flex items-center justify-center space-x-1.5';
-                
-                showNotification('Simulador Iniciado', 'Gerando ticks sintéticos em tempo real.', 'success');
-                addTradeLog('Simulador local ativado com sucesso.', 'info');
-
-                currentSymbol = document.getElementById('symbol-select').value;
-                simInterval = setInterval(() => {
-                    const delta = (Math.random() - 0.495) * 2.5;
-                    currentSimPrice = Math.max(10, currentSimPrice + delta);
-                    const pipSize = 2;
-                    processTick({
-                        quote: currentSimPrice,
-                        symbol: currentSymbol,
-                        pip_size: pipSize
-                    });
-                }, 1000);
-            }
-        };
-
-        window.connectWS = function() {
-            const statusEl = document.getElementById('status-text');
-            const indicatorEl = document.querySelector('#connection-status span');
-            const btnText = document.getElementById('connect-btn-text');
-            const connectBtn = document.getElementById('connect-btn');
-
-            statusEl.innerText = 'Conectando...';
-            statusEl.className = 'text-amber-400';
-            indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse';
-
-            currentSymbol = document.getElementById('symbol-select').value;
-            
-            let wsUrl = currentEndpoint;
-            if(!wsUrl.includes('?')) {
-                wsUrl += `?app_id=${appId}`;
-            } else if(!wsUrl.includes('app_id=')) {
-                wsUrl += `&app_id=${appId}`;
-            }
-            
-            try {
-                ws = new WebSocket(wsUrl);
-            } catch(e) {
-                console.error('WebSocket Exception:', e);
-                statusEl.innerText = 'Falha na Conexão';
-                showNotification('Erro', 'Não foi possível iniciar o WebSocket.', 'error');
-                return;
-            }
-
-            ws.onopen = function() {
-                isConnected = true;
-                statusEl.innerText = 'Conectado';
-                statusEl.className = 'text-emerald-400';
-                indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
-                btnText.innerText = 'Desconectar';
-                connectBtn.className = 'w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-rose-600/20 flex items-center justify-center space-x-2';
-                
-                showNotification('Conexão Estabelecida', `Conectado com sucesso ao servidor Deriv`, 'success');
-                addTradeLog(`Conectado ao ativo ${currentSymbol}`, 'info');
-
-                // Enviar subscrição de tick padrão Deriv API v3
-                ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
-            };
-
-            ws.onmessage = function(event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    if(data.msg_type === 'tick' && data.tick) {
-                        processTick(data.tick);
-                    } else if(data.tick) {
-                        processTick(data.tick);
-                    }
-                } catch(err) {
-                    console.error('Erro ao processar mensagem do WS:', err);
-                }
-            };
-
-            ws.onerror = function(error) {
-                console.error('WebSocket Error:', error);
-                statusEl.innerText = 'Erro na Conexão';
-                showNotification('Erro WebSocket', 'Falha na comunicação com o servidor.', 'error');
-            };
-
-            ws.onclose = function() {
-                if(isConnected) {
-                    disconnectWS(false);
-                }
-            };
-        };
-
-        function disconnectWS(notify = true) {
-            if(ws) {
-                ws.close();
-                ws = null;
-            }
-            isConnected = false;
-            const statusEl = document.getElementById('status-text');
-            const indicatorEl = document.querySelector('#connection-status span');
-            const btnText = document.getElementById('connect-btn-text');
-            const connectBtn = document.getElementById('connect-btn');
-
-            statusEl.innerText = 'Desconectado';
-            statusEl.className = 'text-amber-400';
-            indicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-            btnText.innerText = 'Conectar API';
-            connectBtn.className = 'w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-2';
-
-            if(notify) {
-                showNotification('Desconectado', 'Sessão encerrada.', 'info');
-                addTradeLog('Sessão desconectada.', 'error');
-            }
-        }
-
-        document.getElementById('symbol-select').addEventListener('change', function(e) {
-            currentSymbol = e.target.value;
-            if(isConnected && ws) {
-                disconnectWS(false);
-                window.connectWS();
-            } else if(isSimulating) {
-                addTradeLog(`Ativo alterado para ${currentSymbol}`, 'info');
-            }
+    async function fetchAccountsOAuth() {
+      try {
+        const res = await fetch('https://api.derivws.com/trading/v1/options/accounts', {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${derivAccessToken}` }
+        });
+        const data = await res.json();
+        if(data.errors) return alert("Erro ao carregar contas: " + data.errors[0].message);
+        
+        accountsData = data.data;
+        
+        const select = document.getElementById('account-selector');
+        select.innerHTML = '';
+        accountsData.forEach(acc => {
+          const opt = document.createElement('option');
+          opt.value = acc.account_id;
+          opt.text = `${acc.account_id} (${acc.currency}) - ${acc.account_type.toUpperCase()}`;
+          select.appendChild(opt);
         });
 
-        function processTick(tick) {
-            const price = tick.quote;
-            const pipSize = tick.pip_size || 2;
-            const priceStr = price.toFixed(pipSize);
-            const lastChar = priceStr.charAt(priceStr.length - 1);
-            const digit = parseInt(lastChar);
+        if(accountsData.length > 0) switchAccountOTP();
+        
+      } catch (err) { alert("Falha de ligação à API Rest de contas."); }
+    }
 
-            if(isNaN(digit)) return;
+    async function switchAccountOTP() {
+      const accountId = document.getElementById('account-selector').value;
+      const accInfo = accountsData.find(a => a.account_id === accountId);
+      
+      if(accInfo) document.getElementById('acc-balance').innerText = `$ ${accInfo.balance.toFixed(2)}`;
 
-            const priceDisplay = document.getElementById('price-display');
-            const prevPrice = parseFloat(priceDisplay.innerText) || price;
-            priceDisplay.innerText = priceStr;
-            
-            const dirEl = document.getElementById('price-direction');
-            if(price > prevPrice) {
-                dirEl.innerHTML = '<i class="fa-solid fa-arrow-up text-emerald-400"></i> Alta';
-                dirEl.className = 'text-xs font-semibold mt-1 text-emerald-400';
-            } else if(price < prevPrice) {
-                dirEl.innerHTML = '<i class="fa-solid fa-arrow-down text-rose-400"></i> Baixa';
-                dirEl.className = 'text-xs font-semibold mt-1 text-rose-400';
-            } else {
-                dirEl.innerHTML = '<i class="fa-solid fa-minus text-slate-400"></i> Estável';
-                dirEl.className = 'text-xs font-semibold mt-1 text-slate-400';
-            }
-
-            const isEven = digit % 2 === 0;
-
-            const digitBox = document.getElementById('last-digit-box');
-            const typeBadge = document.getElementById('digit-type-badge');
-
-            digitBox.innerText = digit;
-            if(isEven) {
-                digitBox.className = 'w-16 h-16 rounded-2xl bg-blue-950/60 border-2 border-blue-500 flex items-center justify-center text-3xl font-black text-blue-400 shadow-lg shadow-blue-500/20 transition-all duration-300';
-                typeBadge.className = 'mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30';
-                typeBadge.innerText = 'PAR (EVEN)';
-            } else {
-                digitBox.className = 'w-16 h-16 rounded-2xl bg-pink-950/60 border-2 border-pink-500 flex items-center justify-center text-3xl font-black text-pink-400 shadow-lg shadow-pink-500/20 transition-all duration-300';
-                typeBadge.className = 'mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-pink-500/20 text-pink-400 border border-pink-500/30';
-                typeBadge.innerText = 'ÍMPAR (ODD)';
-            }
-
-            totalTicks++;
-            digitCounts[digit]++;
-            if(isEven) evenCount++; else oddCount++;
-
-            const typeStr = isEven ? 'EVEN' : 'ODD';
-            if(currentStreakType === typeStr) {
-                currentStreakCount++;
-            } else {
-                currentStreakType = typeStr;
-                currentStreakCount = 1;
-            }
-
-            if(typeStr === 'EVEN' && currentStreakCount > maxEvenStreak) {
-                maxEvenStreak = currentStreakCount;
-            }
-            if(typeStr === 'ODD' && currentStreakCount > maxOddStreak) {
-                maxOddStreak = currentStreakCount;
-            }
-
-            tickHistory.unshift({ digit, isEven, time: new Date() });
-            if(tickHistory.length > 50) tickHistory.pop();
-
-            updateStatsUI();
-            checkAutoBotTrigger(typeStr, currentStreakCount);
-        }
-
-        function updateStatsUI() {
-            document.getElementById('total-ticks-count').innerText = `${totalTicks} Ticks`;
-            const evenPct = totalTicks > 0 ? ((evenCount / totalTicks) * 100).toFixed(1) : '50.0';
-            const oddPct = totalTicks > 0 ? ((oddCount / totalTicks) * 100).toFixed(1) : '50.0';
-
-            document.getElementById('even-percent').innerText = `${evenPct}%`;
-            document.getElementById('odd-percent').innerText = `${oddPct}%`;
-            document.getElementById('even-bar').style.width = `${evenPct}%`;
-            document.getElementById('odd-bar').style.width = `${oddPct}%`;
-
-            const streakTypeEl = document.getElementById('current-streak-type');
-            streakTypeEl.innerText = currentStreakType ? (currentStreakType === 'EVEN' ? 'PAR' : 'ÍMPAR') : 'Nenhuma';
-            streakTypeEl.className = `text-xs font-bold uppercase tracking-wider mb-1 ${currentStreakType === 'EVEN' ? 'text-blue-400' : 'text-pink-400'}`;
-            document.getElementById('current-streak-count').innerText = currentStreakCount;
-            document.getElementById('max-even-streak').innerText = maxEvenStreak;
-            document.getElementById('max-odd-streak').innerText = maxOddStreak;
-
-            for(let i=0; i<10; i++) {
-                const count = digitCounts[i];
-                const pct = totalTicks > 0 ? ((count / totalTicks) * 100).toFixed(1) : '0.0';
-                document.getElementById(`freq-count-${i}`).innerText = count;
-                document.getElementById(`freq-pct-${i}`).innerText = `${pct}%`;
-            }
-            document.getElementById('sample-size-text').innerText = `Amostra: ${totalTicks} ticks`;
-
-            const listEl = document.getElementById('recent-digits-list');
-            listEl.innerHTML = '';
-            tickHistory.slice(0, 15).forEach(item => {
-                const badge = document.createElement('div');
-                const bgCol = item.isEven ? 'bg-blue-500/20 text-blue-400 border-blue-500/40' : 'bg-pink-500/20 text-pink-400 border-pink-500/40';
-                badge.className = `w-8 h-8 rounded-xl border flex items-center justify-center font-bold text-xs shrink-0 ${bgCol}`;
-                badge.innerText = item.digit;
-                listEl.appendChild(badge);
-            });
-        }
-
-        function checkAutoBotTrigger(typeStr, streakCount) {
-            const isBotActive = document.getElementById('auto-bot-toggle').checked;
-            if(!isBotActive || activeTradeLock) return;
-
-            const targetTrigger = parseInt(document.getElementById('bot-strategy-trigger').value);
-            const strategyAction = document.getElementById('bot-strategy-action').value;
-
-            if(streakCount >= targetTrigger) {
-                let predictedType = '';
-                if(strategyAction === 'REVERSE') {
-                    predictedType = typeStr === 'EVEN' ? 'ODD' : 'EVEN';
-                } else {
-                    predictedType = typeStr;
-                }
-
-                addTradeLog(`Bot acionado por streak de ${streakCount} ${typeStr}. Entrando em ${predictedType}`, 'info');
-                executeTrade(predictedType);
-            }
-        }
-
-        window.executeTrade = function(type) {
-            const baseStake = parseFloat(document.getElementById('stake-input').value) || 1.00;
-            const martingaleMul = parseFloat(document.getElementById('martingale-input').value) || 2.0;
-            const maxGales = parseInt(document.getElementById('max-martingale-input').value) || 5;
-            const takeProfit = parseFloat(document.getElementById('take-profit-input').value) || 10.00;
-            const stopLoss = parseFloat(document.getElementById('stop-loss-input').value) || 20.00;
-            const mode = document.getElementById('exec-mode').value;
-
-            if(stats.pl >= takeProfit) {
-                showNotification('Meta Atingida!', `Take Profit de $${takeProfit.toFixed(2)} alcançado. Bot pausado.`, 'success');
-                document.getElementById('auto-bot-toggle').checked = false;
-                return;
-            }
-            if(stats.pl <= -stopLoss) {
-                showNotification('Stop Loss Atingido!', `Limite de perda de -$${stopLoss.toFixed(2)} atingido. Bot pausado por segurança.`, 'error');
-                document.getElementById('auto-bot-toggle').checked = false;
-                return;
-            }
-
-            if(tickHistory.length === 0) {
-                showNotification('Aviso', 'Aguardando o próximo tick para validar a entrada.', 'error');
-                return;
-            }
-
-            let currentStake = baseStake * Math.pow(martingaleMul, currentMartingaleStep);
-            
-            if(activeTradeLock && mode === 'sim') {
-                return;
-            }
-
-            activeTradeLock = true;
-            addTradeLog(`Iniciando operação em ${type} com Stake de $${currentStake.toFixed(2)} (Gale: ${currentMartingaleStep})`, 'info');
-
-            if(mode === 'real' && !isSimulating) {
-                if(!ws || !isConnected) {
-                    showNotification('Erro', 'Conecte-se à API WebSocket primeiro.', 'error');
-                    activeTradeLock = false;
-                    return;
-                }
-                
-                ws.send(JSON.stringify({
-                    proposal: 1,
-                    amount: currentStake,
-                    basis: 'stake',
-                    currency: 'USD',
-                    symbol: currentSymbol,
-                    duration: 1,
-                    duration_unit: 't',
-                    contract_type: type === 'EVEN' ? 'DIGITEVEN' : 'DIGITODD'
-                }));
-
-                const handleOrderResponse = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        if(data.msg_type === 'proposal') {
-                            ws.send(JSON.stringify({ buy: data.proposal.id, price: currentStake }));
-                        } else if(data.msg_type === 'buy') {
-                            ws.removeEventListener('message', handleOrderResponse);
-                            showNotification('Contrato Comprado', `ID: ${data.buy.contract_id}`, 'success');
-                            addTradeLog(`Contrato ID ${data.buy.contract_id} aberto com sucesso.`, 'success');
-                            activeTradeLock = false;
-                        } else if(data.error) {
-                            ws.removeEventListener('message', handleOrderResponse);
-                            showNotification('Erro na Ordem', data.error.message, 'error');
-                            addTradeLog(`Erro API: ${data.error.message}`, 'error');
-                            activeTradeLock = false;
-                        }
-                    } catch(err) {}
-                };
-                ws.addEventListener('message', handleOrderResponse);
-            } else {
-                simulateLocalTrade(type, currentStake, maxGales);
-            }
+      try {
+        const res = await fetch(`https://api.derivws.com/trading/v1/options/accounts/${accountId}/otp`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${derivAccessToken}` }
+        });
+        
+        const data = await res.json();
+        if(data.errors) return alert("Erro ao obter o OTP: " + data.errors[0].message);
+        
+        if(wsTrade) wsTrade.close();
+        wsTrade = new WebSocket(data.data.url);
+        
+        wsTrade.onopen = () => { console.log(`WebSocket de Operações Ligado: ${accountId}`); };
+        wsTrade.onmessage = (event) => {
+          const msg = JSON.parse(event.data);
+          console.log("WS Trade Msg:", msg);
         };
+      } catch (err) { alert("Erro na ligação ao WebSocket Autenticado."); }
+    }
 
-        function simulateLocalTrade(predictedType, stake, maxGales) {
-            const checkNextTick = setInterval(() => {
-                if(tickHistory.length > 0) {
-                    clearInterval(checkNextTick);
-                    const lastTick = tickHistory[0];
-                    const won = (predictedType === 'EVEN' && lastTick.isEven) || (predictedType === 'ODD' && !lastTick.isEven);
-                    
-                    stats.total++;
-                    if(won) {
-                        stats.wins++;
-                        const profit = stake * 0.95;
-                        stats.pl += profit;
-                        showNotification('Vitória! (WIN)', `Dígito: ${lastTick.digit}. Lucro: +$${profit.toFixed(2)}`, 'success');
-                        addTradeLog(`WIN! Dígito ${lastTick.digit} (${predictedType}). Lucro +$${profit.toFixed(2)}`, 'success');
-                        currentMartingaleStep = 0;
-                    } else {
-                        stats.losses++;
-                        stats.pl -= stake;
-                        showNotification('Derrota! (LOSS)', `Dígito: ${lastTick.digit}. Prejuízo: -$${stake.toFixed(2)}`, 'error');
-                        addTradeLog(`LOSS! Dígito ${lastTick.digit} (${predictedType}). Perda -$${stake.toFixed(2)}`, 'error');
-                        
-                        if(currentMartingaleStep < maxGales) {
-                            currentMartingaleStep++;
-                            addTradeLog(`Aplicando Martingale. Próximo Gale: Nível ${currentMartingaleStep}`, 'info');
-                        } else {
-                            addTradeLog(`Máximo de gales (${maxGales}) atingido. Reiniciando ciclo.`, 'error');
-                            currentMartingaleStep = 0;
-                        }
-                    }
+    function logoutDeriv() {
+      if(wsTrade) wsTrade.close();
+      derivAccessToken = '';
+      document.getElementById('trade-login-view').style.display = 'flex';
+      document.getElementById('trade-controls-view').style.display = 'none';
+    }
 
-                    updateTradingStatsUI();
-                    activeTradeLock = false;
-                }
-            }, 1000);
+    // --- FUNÇÕES DA UI DO TRADE PAINEL ---
+    function switchTradeTab(tab) {
+      document.getElementById('tab-manual').classList.remove('active');
+      document.getElementById('tab-robo').classList.remove('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      
+      const btn = document.getElementById('btn-execute-trade');
+      if(tab === 'manual') {
+        btn.innerText = "Realizar entrada";
+        btn.style.backgroundColor = "var(--accent-blue)";
+        isBotActive = false;
+      } else {
+        btn.innerText = "Iniciar Robô (Automático)";
+        btn.style.backgroundColor = "var(--accent-green)";
+        isBotActive = true;
+      }
+    }
+
+    function selectTradeType(type) {
+      document.getElementById('btn-type-par').classList.remove('active');
+      document.getElementById('btn-type-impar').classList.remove('active');
+      if(type === 'PAR') {
+        document.getElementById('btn-type-par').classList.add('active');
+        currentTradeType = 'DIGITEVEN';
+      } else {
+        document.getElementById('btn-type-impar').classList.add('active');
+        currentTradeType = 'DIGITODD';
+      }
+    }
+
+    function adjustGale(op) {
+      let val = parseFloat(document.getElementById('trade-gale').value);
+      if (op === 'mult') val *= 2;
+      if (op === 'div') val /= 2;
+      document.getElementById('trade-gale').value = val.toFixed(2);
+    }
+
+    function executeTrade(overrideStake = null) {
+      if(!wsTrade || wsTrade.readyState !== WebSocket.OPEN) return alert("Conecte-se e selecione uma conta primeiro.");
+      
+      if(isBotActive && overrideStake === null) {
+        alert("Modo Robô Ativado! As entradas ocorrerão automaticamente baseadas no seu padrão.");
+        return;
+      }
+      
+      const stake = overrideStake || document.getElementById('trade-stake').value;
+      wsTrade.send(JSON.stringify({
+        buy: 1,
+        price: stake,
+        parameters: {
+          amount: stake, basis: "stake", contract_type: currentTradeType,
+          currency: "USD", duration: 1, duration_unit: "t", symbol: "R_100"
         }
+      }));
+    }
 
-        function updateTradingStatsUI() {
-            document.getElementById('stat-total-trades').innerText = stats.total;
-            document.getElementById('stat-wins').innerText = stats.wins;
-            document.getElementById('stat-losses').innerText = stats.losses;
-            document.getElementById('stat-current-gale').innerText = currentMartingaleStep;
-            
-            const plEl = document.getElementById('session-pl');
-            const sign = stats.pl > 0 ? '+$' : (stats.pl < 0 ? '-$' : '$');
-            plEl.innerText = `${sign}${Math.abs(stats.pl).toFixed(2)}`;
-            if(stats.pl > 0) {
-                plEl.className = 'font-mono font-bold text-sm text-emerald-400';
-            } else if(stats.pl < 0) {
-                plEl.className = 'font-mono font-bold text-sm text-rose-400';
-            } else {
-                plEl.className = 'font-mono font-bold text-sm text-slate-200';
+    // --- FUNÇÕES ORIGINAIS DO CATALOGADOR ---
+    function updateClock() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      clockEl.innerText = `${hrs}:${mins}:${secs}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function toggleCataloger() { document.getElementById('cataloger-panel').classList.toggle('active'); }
+
+    function toggleStrategyMode() {
+      const val = document.getElementById('strategy_select').value;
+      const builderPanel = document.getElementById('manual-builder-panel');
+      const boxImpar = document.getElementById('result-box-impar');
+      const boxPar = document.getElementById('result-box-par');
+      const titlePar = document.getElementById('par-title');
+
+      if (val !== 'MANUAL') {
+        builderPanel.style.display = 'none';
+        boxImpar.style.display = 'none';
+        boxPar.style.gridColumn = 'span 2';
+        if (val === 'STRAT_1') {
+          titlePar.innerText = "Resultado: Estratégia 1 (Mesma Direção + Mesma Cor)";
+          titlePar.style.color = "var(--accent-blue)"; boxPar.style.borderColor = "var(--accent-blue)";
+        } else {
+          titlePar.innerText = "Resultado: Estratégia 2 (Mesma Direção + Cor Diferente)";
+          titlePar.style.color = "var(--accent-yellow)"; boxPar.style.borderColor = "var(--accent-yellow)";
+        }
+      } else {
+        builderPanel.style.display = 'flex'; 
+        boxImpar.style.display = 'block';
+        boxPar.style.gridColumn = 'span 1';
+        titlePar.innerText = "Entrada Alvo: PAR";
+        titlePar.style.color = "var(--accent-blue)"; boxPar.style.borderColor = "var(--accent-blue)";
+      }
+      autoReCatalog();
+    }
+
+    function addCustomCombinedBlock() {
+      const digitVal = document.getElementById('cb-digit').value;
+      const parityVal = document.getElementById('cb-parity').value;
+      const dirVal = document.getElementById('cb-direction').value;
+      let parts = [];
+      if (digitVal !== "") parts.push(`D${digitVal}`);
+      if (parityVal !== "") parts.push(parityVal);
+      if (dirVal !== "") parts.push(dirVal);
+      if (parts.length === 0) return;
+      addBlock(parts.join('+'));
+      document.getElementById('cb-digit').value = "";
+      document.getElementById('cb-parity').value = "";
+      document.getElementById('cb-direction').value = "";
+    }
+
+    function addBlock(val) { pattern.push(val.toUpperCase()); renderPattern(); syncCataloger(); }
+    function removeBlock(idx) { pattern.splice(idx, 1); renderPattern(); syncCataloger(); }
+    function clearPattern() { pattern = []; renderPattern(); syncCataloger(); }
+
+    function renderPattern() {
+      const display = document.getElementById('patternDisplay');
+      display.innerHTML = '';
+      if(pattern.length === 0) { display.innerHTML = '<span style="color:var(--text-muted); font-size:11px;">O padrão está vazio.</span>'; return; }
+      pattern.forEach((b, idx) => {
+        const chip = document.createElement('div');
+        let typeClass = '';
+        const strVal = String(b).toUpperCase();
+        if (strVal.includes('+')) typeClass = 'combo';
+        else if(strVal.includes('UP')) typeClass = 'up';
+        else if(strVal.includes('DOWN')) typeClass = 'down';
+        else if(strVal.includes('PAR') && !strVal.includes('IMPAR') && !strVal.includes('ÍMPAR')) typeClass = 'even';
+        else typeClass = 'odd';
+        chip.className = `chip ${typeClass}`;
+        chip.innerHTML = `${b} <span style="font-size:10px; opacity:0.6; margin-left:4px;">✕</span>`;
+        chip.onclick = () => removeBlock(idx);
+        display.appendChild(chip);
+      });
+    }
+
+    function createEmptyRow() {
+      const row = {};
+      for (let i = 0; i < 10; i++) row[i] = { 0: null, 20: null, 40: null, time: "--:--" };
+      return row;
+    }
+
+    function renderStoneHTML(tick) {
+      if (!tick) return `<div class="stone empty"><div class="circle">-</div></div>`;
+      const arrowSymbol = tick.direction === 'up' ? '▲' : '▼';
+      const arrowClass = tick.direction === 'up' ? 'up' : 'down';
+      let highlightClass = '';
+      if (winEpochs.has(tick.epoch)) highlightClass = 'win-pattern';
+      else if (lossEpochs.has(tick.epoch)) highlightClass = 'loss-pattern';
+      else if (highlightedEpochs.has(tick.epoch)) highlightClass = 'highlight-pattern';
+      return `<div class="stone ${tick.label} ${highlightClass}"><div class="circle">${tick.digit}</div><div class="arrow ${arrowClass}">${arrowSymbol}</div></div>`;
+    }
+
+    function renderLiveRow() {
+      liveRowEl.innerHTML = "";
+      for (let min = 0; min < 10; min++) {
+        const colData = globalLiveRow[min];
+        const roundBox = document.createElement("div");
+        roundBox.className = "round-box";
+        roundBox.innerHTML = `<div class="round-stones">${renderStoneHTML(colData[0])}${renderStoneHTML(colData[20])}${renderStoneHTML(colData[40])}</div><div class="time-bar">${colData.time || "--:--"}</div>`;
+        liveRowEl.appendChild(roundBox);
+      }
+    }
+
+    function addTick(epoch, price, isHistorical = false) {
+      const currentPrice = Number(price);
+      let direction = lastPrice !== null ? (currentPrice >= lastPrice ? 'up' : 'down') : 'up';
+      lastPrice = currentPrice;
+
+      const date = new Date(epoch * 1000);
+      const rawSec = date.getSeconds();
+
+      let sec = null;
+      if (rawSec >= 0 && rawSec <= 3) sec = 0;
+      else if (rawSec >= 20 && rawSec <= 23) sec = 20;
+      else if (rawSec >= 40 && rawSec <= 43) sec = 40;
+      if (sec === null) return;
+
+      const minute = date.getMinutes();
+      const minCol = minute % 10;
+      const roundKey = `${date.getHours()}:${minute}`;
+      const uniqueKey = `${roundKey}:${sec}`;
+
+      if (processedKeys.has(uniqueKey)) return;
+      processedKeys.add(uniqueKey);
+
+      const priceStr = currentPrice.toFixed(2);
+      const lastDigit = parseInt(priceStr.slice(-1));
+      const hours = String(date.getHours()).padStart(2, '0');
+      const mins = String(date.getMinutes()).padStart(2, '0');
+      const timeString = `${hours}:${mins}`;
+
+      const tickData = {
+        sec, col: minCol, digit: lastDigit,
+        label: lastDigit % 2 === 0 ? 'even' : 'odd',
+        parity: lastDigit % 2 === 0 ? 'PAR' : 'ÍMPAR',
+        dir: direction === 'up' ? 'UP' : 'DOWN',
+        direction, time: timeString, epoch
+      };
+
+      globalTicksList.push(tickData);
+      const groupMin = Math.floor(minute / 10) * 10;
+      const groupKey = `${hours}:${String(groupMin).padStart(2, '0')}`;
+
+      if (isHistorical) {
+        processHistoricalTick(tickData, minCol, groupKey);
+        return;
+      }
+
+      if (currentTenMinBlock !== null && currentTenMinBlock !== groupKey) {
+        historyRows.unshift(globalLiveRow);
+        globalLiveRow = createEmptyRow();
+        currentTenMinBlock = groupKey;
+        renderHistory();
+      } else if (currentTenMinBlock === null) { currentTenMinBlock = groupKey; }
+
+      globalLiveRow[minCol][sec] = tickData;
+      globalLiveRow[minCol].time = timeString;
+
+      renderLiveRow();
+      syncCataloger();
+    }
+
+    function processHistoricalTick(tick, minCol, groupKey) {
+      if (!tempHistoryMap[groupKey]) tempHistoryMap[groupKey] = createEmptyRow();
+      tempHistoryMap[groupKey][minCol][tick.sec] = tick;
+      tempHistoryMap[groupKey][minCol].time = tick.time;
+    }
+
+    function requestHistoricalBatch() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ ticks_history: SYMBOL, style: "ticks", count: 5000, end: oldestEpochReceived }));
+    }
+
+    function processAllHistory() {
+      rawHistoricalTicks.sort((a, b) => a.epoch - b.epoch);
+      rawHistoricalTicks.forEach(item => { addTick(item.epoch, item.price, true); });
+      finalizeHistoryBuild();
+      isHistoryLoaded = true;
+      statusBar.textContent = "Sistema Conectado - Ao Vivo";
+      statusBar.className = "connected";
+      ws.send(JSON.stringify({ ticks: SYMBOL, subscribe: 1 }));
+    }
+
+    function finalizeHistoryBuild() {
+      const sortedKeys = Object.keys(tempHistoryMap).sort().reverse();
+      if (sortedKeys.length > 0) {
+        const latestKey = sortedKeys[0];
+        globalLiveRow = tempHistoryMap[latestKey];
+        currentTenMinBlock = latestKey; 
+        delete tempHistoryMap[latestKey];
+      }
+      const remainingKeys = Object.keys(tempHistoryMap).sort().reverse();
+      historyRows = remainingKeys.map(k => tempHistoryMap[k]);
+      renderHistory(); renderLiveRow(); syncCataloger();
+    }
+
+    function renderHistory() {
+      historyContainerEl.innerHTML = "";
+      for (const row of historyRows) {
+        const rowGrid = document.createElement("div");
+        rowGrid.className = "row-grid";
+        for (let min = 0; min < 10; min++) {
+          const colData = row[min];
+          const roundBox = document.createElement("div");
+          roundBox.className = "round-box";
+          roundBox.innerHTML = `<div class="round-stones">${renderStoneHTML(colData[0])}${renderStoneHTML(colData[20])}${renderStoneHTML(colData[40])}</div><div class="time-bar">${colData.time || "--:--"}</div>`;
+          rowGrid.appendChild(roundBox);
+        }
+        historyContainerEl.appendChild(rowGrid);
+      }
+    }
+
+    function syncCataloger() { autoReCatalog(); }
+
+    function checkTickMatch(patternBlock, tick) {
+      if (!tick) return false;
+      const blockStr = String(patternBlock).toUpperCase().trim();
+      if (blockStr.includes('+')) {
+        const parts = blockStr.split('+'); return parts.every(part => checkTickMatch(part, tick));
+      }
+      if (blockStr.startsWith('D') && blockStr.length === 2) return tick.digit === parseInt(blockStr.replace('D', ''));
+      if (blockStr.includes('PAR') && !blockStr.includes('IMPAR') && !blockStr.includes('ÍMPAR')) return tick.parity === 'PAR';
+      if (blockStr.includes('IMPAR') || blockStr.includes('ÍMPAR')) return tick.parity === 'ÍMPAR';
+      if (blockStr.includes('UP')) return tick.dir === 'UP';
+      if (blockStr.includes('DOWN')) return tick.dir === 'DOWN';
+      if (!isNaN(patternBlock)) return tick.digit === parseInt(patternBlock);
+      return false;
+    }
+
+    function calcDynamicStrategy(sequences, stratType, maxGale, dryRun = false) {
+      let total = 0, win0 = 0, winGale = 0, losses = 0;
+      let currentWins = 0, maxWins = 0, currentLosses = 0, maxLosses = 0;
+      let lossEpochsGap = [];
+      const L = 2;
+      let colStats = {};
+      for(let c=0; c<10; c++) colStats[c] = { total: 0, win0: 0, winGale: 0, losses: 0 };
+
+      sequences.forEach(tList => {
+        let i = 0;
+        while (i <= tList.length - L - 1) {
+          const t1 = tList[i]; const t2 = tList[i+1];
+          let match = false; let targetParity = '';
+          if (stratType === 'STRAT_1') { if (t1.dir === t2.dir && t1.parity === t2.parity) { match = true; targetParity = t1.parity; } } 
+          else if (stratType === 'STRAT_2') { if (t1.dir === t2.dir && t1.parity !== t2.parity) { match = true; targetParity = t1.digit < t2.digit ? t1.parity : t2.parity; } }
+
+          if (match) {
+            total++;
+            const signalCol = t2.col; colStats[signalCol].total++;
+            if (!dryRun) { highlightedEpochs.add(t1.epoch); highlightedEpochs.add(t2.epoch); }
+            let won = false; let attemptEpochs = [];
+            for (let g = 0; g <= maxGale; g++) {
+              const checkIndex = i + L + g;
+              if (checkIndex >= tList.length) break;
+              const checkTick = tList[checkIndex];
+              attemptEpochs.push(checkTick.epoch);
+              if (checkTick.parity === targetParity) {
+                if (g === 0) { win0++; colStats[signalCol].win0++; } else { winGale++; colStats[signalCol].winGale++; }
+                won = true; break;
+              }
             }
+            if (!dryRun) {
+                if (won) { winEpochs.add(attemptEpochs[attemptEpochs.length - 1]); } 
+                else { attemptEpochs.forEach(ep => lossEpochs.add(ep)); }
+            }
+            if (won) { currentWins++; if (currentWins > maxWins) maxWins = currentWins; currentLosses = 0; } 
+            else {
+              losses++; colStats[signalCol].losses++;
+              currentLosses++; if (currentLosses > maxLosses) maxLosses = currentLosses;
+              currentWins = 0; if (i + L < tList.length) lossEpochsGap.push(tList[i + L].epoch);
+            }
+            i++; 
+          } else { i++; }
         }
-    </script>
+      });
+      let avgLossGap = 'Sem Loss';
+      if (lossEpochsGap.length > 1) {
+        let totalGapSec = 0;
+        for (let k = 1; k < lossEpochsGap.length; k++) totalGapSec += (lossEpochsGap[k] - lossEpochsGap[k - 1]);
+        const avgSec = totalGapSec / (lossEpochsGap.length - 1);
+        const mins = Math.floor(avgSec / 60); const secs = Math.round(avgSec % 60);
+        avgLossGap = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+      } else if (lossEpochsGap.length === 1) { avgLossGap = '1 Loss'; }
+      return { total, win0, winGale, losses, maxWins, maxLosses, avgLossGap, colStats };
+    }
+
+    function calcTargetResult(sequences, L, targetParity, maxGale, dryRun = false) {
+      let total = 0, win0 = 0, winGale = 0, losses = 0;
+      let currentWins = 0, maxWins = 0, currentLosses = 0, maxLosses = 0;
+      let lossEpochsGap = [];
+      let colStats = {};
+      for(let c=0; c<10; c++) colStats[c] = { total: 0, win0: 0, winGale: 0, losses: 0 };
+
+      sequences.forEach(tList => {
+        let i = 0;
+        while (i <= tList.length - L - 1) {
+          let match = true;
+          for (let j = 0; j < L; j++) { if (!checkTickMatch(pattern[j], tList[i + j])) { match = false; break; } }
+          if (match) {
+            total++;
+            const signalCol = tList[i + L - 1].col; colStats[signalCol].total++;
+            let won = false; let attemptEpochs = [];
+            if (!dryRun) { for (let j = 0; j < L; j++) highlightedEpochs.add(tList[i + j].epoch); }
+            for (let g = 0; g <= maxGale; g++) {
+              const checkIndex = i + L + g;
+              if (checkIndex >= tList.length) break;
+              const checkTick = tList[checkIndex];
+              attemptEpochs.push(checkTick.epoch);
+              if (checkTick.parity === targetParity) {
+                if (g === 0) { win0++; colStats[signalCol].win0++; } else { winGale++; colStats[signalCol].winGale++; }
+                won = true; break;
+              }
+            }
+            if (!dryRun) {
+                if (won) { winEpochs.add(attemptEpochs[attemptEpochs.length - 1]); } 
+                else { attemptEpochs.forEach(ep => lossEpochs.add(ep)); }
+            }
+            if (won) { currentWins++; if (currentWins > maxWins) maxWins = currentWins; currentLosses = 0; } 
+            else {
+              losses++; colStats[signalCol].losses++;
+              currentLosses++; if (currentLosses > maxLosses) maxLosses = currentLosses;
+              currentWins = 0; if (i + L < tList.length) lossEpochsGap.push(tList[i + L].epoch);
+            }
+            i++; 
+          } else { i++; }
+        }
+      });
+      let avgLossGap = 'Sem Loss';
+      if (lossEpochsGap.length > 1) {
+        let totalGapSec = 0;
+        for (let k = 1; k < lossEpochsGap.length; k++) totalGapSec += (lossEpochsGap[k] - lossEpochsGap[k - 1]);
+        const avgSec = totalGapSec / (lossEpochsGap.length - 1);
+        const mins = Math.floor(avgSec / 60); const secs = Math.round(avgSec % 60);
+        avgLossGap = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+      } else if (lossEpochsGap.length === 1) { avgLossGap = '1 Loss'; }
+      return { total, win0, winGale, losses, maxWins, maxLosses, avgLossGap, colStats };
+    }
+
+    function updateResultUI(prefix, res) {
+      if (!res) return;
+      document.getElementById(`${prefix}-total`).innerText = res.total || 0;
+      document.getElementById(`${prefix}-win0`).innerText = res.win0 || 0;
+      document.getElementById(`${prefix}-wingale`).innerText = res.winGale || 0;
+      document.getElementById(`${prefix}-max-wins`).innerText = res.maxWins || 0;
+      document.getElementById(`${prefix}-max-losses`).innerText = res.maxLosses || 0;
+      document.getElementById(`${prefix}-rate`).innerText = res.total > 0 ? Math.round(((res.win0 + res.winGale) / res.total) * 100) + '%' : '0%';
+      document.getElementById(`${prefix}-loss-gap`).innerText = res.avgLossGap || 'Sem Loss';
+    }
+
+    function getColumnAnalysis(tList) {
+        if (!tList || tList.length === 0) return { domText: 'Sem Dados', patternStatus: '-', color: 'var(--text-muted)' };
+        let p = 0; tList.forEach(t => { if (t.parity === 'PAR') p++; });
+        let pPct = (p / tList.length) * 100;
+        let domText = "EQUILÍBRIO 50%";
+        if (pPct > 50) domText = `DOMÍNIO PAR ${Math.round(pPct)}%`;
+        else if (pPct < 50) domText = `DOMÍNIO ÍMPAR ${Math.round(100 - pPct)}%`;
+        if (tList.length < 3) return { domText, patternStatus: "Analisando...", color: "var(--text-muted)" };
+        const recent = tList.slice(-5).map(t => t.parity);
+        const last2 = recent.slice(-2); const last3 = recent.slice(-3); const last4 = recent.slice(-4);
+        let patternStatus = "MISTO / INDEFINIDO"; let color = "var(--text-muted)";
+        if (last4.length === 4 && last4.every(x => x === last4[0])) { patternStatus = `SURF DE ${last4[0]} (4x+)`; color = last4[0] === 'PAR' ? 'var(--accent-blue)' : 'var(--accent-yellow)'; } 
+        else if (last3.length === 3 && last3.every(x => x === last3[0])) { patternStatus = `SEQUÊNCIA ${last3[0]} (3x)`; color = last3[0] === 'PAR' ? 'var(--accent-blue)' : 'var(--accent-yellow)'; } 
+        else if (last3.length === 3 && last3[0] === last3[1] && last3[1] !== last3[2]) { patternStatus = `QUEBRA APÓS 2 (2x1)`; color = "var(--accent-red)"; } 
+        else if (last3.length === 3 && last3[0] !== last3[1] && last3[1] !== last3[2]) { patternStatus = "XADREZ (Alternância)"; color = "var(--accent-green)"; } 
+        else if (last2.length === 2 && last2[0] === last2[1]) { patternStatus = `DUPLA DE ${last2[0]}`; color = "var(--accent-purple)"; }
+        return { domText, patternStatus, color };
+    }
+
+    function updateColumnRanking(stratVal, minEpoch, dynColStats, manParStats, manImparStats) {
+      const grid = document.getElementById('col-ranking-grid');
+      if (stratVal === 'MANUAL' && (!manParStats || !manImparStats)) {
+        grid.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px; grid-column: span 10; padding: 20px;">Monte um padrão no construtor para habilitar o ranking das colunas.</div>'; return;
+      }
+      grid.innerHTML = ''; let bestRate = -1; let bestCol = -1; const stats = [];
+      for(let c = 0; c < 10; c++) {
+        let res; let entryLabel = "";
+        const cTicks = globalTicksList.filter(t => t.col === c && t.epoch >= minEpoch);
+        const colAnalysis = getColumnAnalysis(cTicks);
+        if (stratVal !== 'MANUAL') { res = dynColStats[c]; entryLabel = ""; } 
+        else {
+            const resPar = manParStats.colStats[c]; const resImpar = manImparStats.colStats[c];
+            const ratePar = resPar.total > 0 ? (resPar.win0 + resPar.winGale)/resPar.total : 0;
+            const rateImpar = resImpar.total > 0 ? (resImpar.win0 + resImpar.winGale)/resImpar.total : 0;
+            if (ratePar >= rateImpar) { res = resPar; entryLabel = "PAR"; } else { res = resImpar; entryLabel = "ÍMPAR"; }
+        }
+        const rate = res.total > 0 ? ((res.win0 + res.winGale) / res.total) * 100 : 0;
+        stats.push({ c, rate, total: res.total, win0: res.win0, winGale: res.winGale, losses: res.losses, label: entryLabel, colAnalysis });
+        if (res.total > 0 && rate > bestRate) { bestRate = rate; bestCol = c; }
+      }
+      stats.forEach(st => {
+        const isBest = (st.c === bestCol && st.total > 0);
+        const bg = isBest ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card)';
+        const border = isBest ? 'var(--accent-green)' : 'var(--border-color)';
+        const color = isBest ? 'var(--accent-green)' : (st.rate >= 50 ? 'var(--accent-yellow)' : 'var(--accent-red)');
+        const showLabel = (stratVal === 'MANUAL' && st.total > 0) ? `<div style="font-size:10px; color:var(--accent-purple); font-weight:800; margin-bottom: 6px;">↳ ${st.label}</div>` : '';
+        grid.innerHTML += `<div style="background: ${bg}; border: 1px solid ${border}; padding: 12px; border-radius: 8px; text-align: center; display:flex; flex-direction:column; justify-content:center; transition: transform 0.2s;"><div style="font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">MIN ${st.c}</div>${showLabel}<div style="font-size: 20px; font-weight: 900; color: ${color}; letter-spacing: -1px;">${st.total > 0 ? st.rate.toFixed(0)+'%' : '--'}</div><div style="display: flex; justify-content: center; gap: 8px; font-size: 10px; color: var(--text-muted); margin-top: 8px; font-family: monospace;"><span>W0: <strong style="color:var(--text-main)">${st.win0}</strong></span><span>WG: <strong style="color:var(--text-main)">${st.winGale}</strong></span></div><div style="font-size: 10px; color: var(--accent-red); margin-top: 4px; font-family: monospace;">L: <strong style="color:var(--accent-red)">${st.losses}</strong></div><hr style="border-top: 1px solid var(--border-light); margin: 10px 0; width: 100%;"><div style="font-size: 9px; font-weight:700; color: var(--text-muted); text-transform:uppercase;">${st.colAnalysis.domText}</div><div style="font-size: 10px; font-weight:800; color: ${st.colAnalysis.color}; margin-top:4px; line-height:1.2;">${st.colAnalysis.patternStatus}</div></div>`;
+      });
+    }
+
+    function autoReCatalog() {
+      highlightedEpochs.clear(); winEpochs.clear(); lossEpochs.clear();
+      const stratVal = document.getElementById('strategy_select').value;
+      if (stratVal === 'MANUAL' && pattern.length === 0) {
+        updateResultUI('par', {total:0, win0:0, winGale:0, maxWins:0, maxLosses:0, avgLossGap:'Sem Loss'});
+        updateResultUI('impar', {total:0, win0:0, winGale:0, maxWins:0, maxLosses:0, avgLossGap:'Sem Loss'});
+        renderHistory(); renderLiveRow(); updateColumnRanking('MANUAL', 0, null, null, null); return;
+      }
+      if (globalTicksList.length === 0) return;
+
+      const windowMins = parseInt(document.getElementById('time_window').value);
+      const nowEpoch = Math.floor(Date.now() / 1000);
+      const minEpoch = windowMins > 0 ? nowEpoch - (windowMins * 60) : 0;
+      const mode = document.getElementById('analysis_mode').value;
+      const gales = parseInt(document.getElementById('gale-level').value);
+
+      let tickSequences = [];
+      if (mode === 'horizontal') { tickSequences.push(globalTicksList.filter(t => t.epoch >= minEpoch)); } 
+      else {
+        for (let c = 0; c < 10; c++) {
+          for (let s of [0, 20, 40]) {
+            const colSecTicks = globalTicksList.filter(t => t.col === c && t.sec === s && t.epoch >= minEpoch);
+            if (colSecTicks.length > 0) tickSequences.push(colSecTicks);
+          }
+        }
+      }
+
+      let usedColStats; let mainResPar = null; let mainResImpar = null;
+      if (stratVal !== 'MANUAL') {
+        const dynamicRes = calcDynamicStrategy(tickSequences, stratVal, gales, false);
+        updateResultUI('par', dynamicRes); usedColStats = dynamicRes.colStats;
+      } else {
+        const L = pattern.length;
+        mainResPar = calcTargetResult(tickSequences, L, 'PAR', gales, true);
+        mainResImpar = calcTargetResult(tickSequences, L, 'ÍMPAR', gales, true);
+        updateResultUI('par', mainResPar); updateResultUI('impar', mainResImpar);
+        const ratePar = mainResPar.total > 0 ? (mainResPar.win0 + mainResPar.winGale)/mainResPar.total : 0;
+        const rateImpar = mainResImpar.total > 0 ? (mainResImpar.win0 + mainResImpar.winGale)/mainResImpar.total : 0;
+        if (ratePar >= rateImpar) { calcTargetResult(tickSequences, L, 'PAR', gales, false); } else { calcTargetResult(tickSequences, L, 'ÍMPAR', gales, false); }
+      }
+      updateColumnRanking(stratVal, minEpoch, usedColStats, mainResPar, mainResImpar);
+      renderHistory(); renderLiveRow();
+    }
+
+    function connectWS() {
+      if (ws) ws.close();
+      ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+
+      ws.onopen = () => {
+        statusBar.textContent = "Baixando Histórico (1/6)..."; statusBar.className = "";
+        historyRequestsCount = 0; oldestEpochReceived = "latest"; rawHistoricalTicks = []; requestHistoricalBatch();
+        setInterval(() => { if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 })); }, 20000);
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.error) { statusBar.textContent = `Erro Deriv: ${data.error.message}`; statusBar.className = "error"; return; }
+        if (data.history) {
+          const prices = data.history.prices; const times = data.history.times;
+          if (prices && prices.length > 0) {
+            for (let i = 0; i < prices.length; i++) rawHistoricalTicks.push({ epoch: parseInt(times[i]), price: prices[i] });
+            oldestEpochReceived = parseInt(times[0]);
+          }
+          historyRequestsCount++;
+          if (historyRequestsCount <= TOTAL_HISTORIC_BATCHES && prices && prices.length > 0) {
+            statusBar.textContent = `Baixando Histórico (${historyRequestsCount + 1}/${TOTAL_HISTORIC_BATCHES + 1})...`;
+            setTimeout(() => { requestHistoricalBatch(); }, 400);
+          } else { statusBar.textContent = "Sincronizando Tempos..."; processAllHistory(); }
+        }
+        if (data.msg_type === 'tick' || data.tick) {
+          const tickObj = data.tick; if (tickObj) addTick(tickObj.epoch, tickObj.quote, false);
+        }
+      };
+      ws.onerror = () => { statusBar.textContent = "Falha de Conexão"; statusBar.className = "error"; };
+      ws.onclose = () => { statusBar.textContent = "Desconectado do Servidor"; statusBar.className = "error"; };
+    }
+
+    function refreshTicks() {
+      historyRows = []; tempHistoryMap = {}; processedKeys.clear();
+      rawHistoricalTicks = []; globalTicksList = []; highlightedEpochs.clear(); winEpochs.clear(); lossEpochs.clear();
+      globalLiveRow = createEmptyRow(); isHistoryLoaded = false; lastPrice = null; currentTenMinBlock = null;
+      renderLiveRow(); historyContainerEl.innerHTML = ""; connectWS();
+    }
+
+    window.onload = () => {
+      toggleStrategyMode();
+      renderLiveRow();
+      connectWS();         
+      handleOAuthCallback(); 
+    };
+  </script>
 </body>
 </html>
