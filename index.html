@@ -352,7 +352,6 @@
       </div>
     </div>
 
-    <!-- Wrapper para colocar o Construtor e o Painel de Trade lado a lado -->
     <div class="top-panels-wrapper">
       
       <!-- Painel Original de Catalogação -->
@@ -375,18 +374,14 @@
 
           <div class="grid-3-col">
             <div class="input-group">
-              <label>
-                Direção da Leitura:
-              </label>
+              <label>Direção da Leitura:</label>
               <select id="analysis_mode" onchange="autoReCatalog()">
                 <option value="horizontal">Linha (Seq. Cruzada)</option>
                 <option value="vertical" selected>Coluna (Vertical)</option>
               </select>
             </div>
             <div class="input-group">
-              <label>
-                Amostragem:
-              </label>
+              <label>Amostragem:</label>
               <select id="time_window" onchange="autoReCatalog()">
                 <option value="15">Últimos 15 Minutos</option>
                 <option value="30">Últimos 30 Minutos</option>
@@ -396,9 +391,7 @@
               </select>
             </div>
             <div class="input-group">
-              <label>
-                Martingale:
-              </label>
+              <label>Martingale:</label>
               <select id="gale-level" onchange="autoReCatalog()">
                 <option value="0">Zero Gale (Mão Fixa)</option>
                 <option value="1" selected>Até 1 Gale (G1)</option>
@@ -414,9 +407,7 @@
           <div class="panel-title" style="color: var(--accent-purple);">2. Construtor de Padrão Manual</div>
           
           <div class="input-group">
-            <label>
-              Montar bloco lógico (Combine):
-            </label>
+            <label>Montar bloco lógico (Combine):</label>
             <div class="custom-builder-row">
               <select id="cb-digit">
                 <option value="">Digito (Opcional)</option>
@@ -440,9 +431,7 @@
           </div>
 
           <div class="input-group">
-            <label>
-              Adição Rápida (Atalhos):
-            </label>
+            <label>Adição Rápida (Atalhos):</label>
             <div class="btn-group-cat">
               <button class="btn btn-green" onclick="addBlock('UP')">▲ UP</button>
               <button class="btn btn-red" onclick="addBlock('DOWN')">▼ DOWN</button>
@@ -490,7 +479,7 @@
         </div>
       </div>
 
-      <!-- Novo Painel de Trade (Fica sempre visível, alterna conteúdos) -->
+      <!-- Novo Painel de Trade -->
       <div class="trade-panel" id="trading-ui-panel">
         
         <!-- SECÇÃO 1: MODO DESLOGADO -->
@@ -499,7 +488,6 @@
           <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
             Conecte a sua conta da Deriv de forma segura para operar diretamente a partir deste painel.
           </p>
-          <input type="text" id="oauth-client-id" class="trade-input" placeholder="O seu Client ID (OAuth)" style="margin-bottom: 16px;">
           <button class="btn btn-action" onclick="startOAuthLogin()">Conectar com a Deriv</button>
         </div>
 
@@ -549,7 +537,7 @@
         </div>
       </div>
       
-    </div> <!-- Fim Wrapper Top -->
+    </div>
 
     <div id="col-ranking-panel">
       <div class="panel-title" style="color: var(--accent-blue);">📊 Desempenho Isolado e Tendência por Coluna de Minuto</div>
@@ -610,9 +598,9 @@
     let oldestEpochReceived = "latest";
 
     // --- VARIÁVEIS OAUTH 2.0 & TRADE ---
+    const MEU_APP_ID = '34tlOiTPkBhw0KUW9l1Pf'; // App ID (Ou Token de Cliente) fornecido
     const OAUTH_AUTH_URL = 'https://auth.deriv.com/oauth2/auth';
     const OAUTH_TOKEN_URL = 'https://auth.deriv.com/oauth2/token';
-    let oauthClientId = localStorage.getItem('deriv_oauth_client_id') || '';
     const redirectUri = window.location.origin + window.location.pathname;
 
     let derivAccessToken = '';
@@ -623,10 +611,6 @@
 
     // --- FUNÇÕES OAUTH E API REST ---
     async function startOAuthLogin() {
-      oauthClientId = document.getElementById('oauth-client-id').value.trim();
-      if (!oauthClientId) return alert('Por favor, insira o seu Client ID da Deriv.');
-      localStorage.setItem('deriv_oauth_client_id', oauthClientId);
-
       const array = crypto.getRandomValues(new Uint8Array(64));
       const codeVerifier = Array.from(array).map(v => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v % 66]).join('');
       const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
@@ -636,7 +620,7 @@
       sessionStorage.setItem('pkce_code_verifier', codeVerifier);
       sessionStorage.setItem('oauth_state', state);
 
-      const authUrl = `${OAUTH_AUTH_URL}?response_type=code&client_id=${oauthClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=trade+account_manage&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+      const authUrl = `${OAUTH_AUTH_URL}?response_type=code&client_id=${MEU_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=trade+account_manage&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
       window.location.href = authUrl;
     }
 
@@ -655,14 +639,13 @@
       if (code && state) {
         const savedState = sessionStorage.getItem('oauth_state');
         const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
-        oauthClientId = localStorage.getItem('deriv_oauth_client_id');
 
         if (state !== savedState) return alert('Erro de segurança: O State não coincide.');
 
         try {
           const bodyParams = new URLSearchParams();
           bodyParams.append('grant_type', 'authorization_code');
-          bodyParams.append('client_id', oauthClientId);
+          bodyParams.append('client_id', MEU_APP_ID);
           bodyParams.append('code', code);
           bodyParams.append('code_verifier', codeVerifier);
           bodyParams.append('redirect_uri', redirectUri);
@@ -682,7 +665,6 @@
             
             derivAccessToken = data.access_token;
             
-            // Alterna a interface de deslogado para logado
             document.getElementById('trade-login-view').style.display = 'none';
             document.getElementById('trade-controls-view').style.display = 'flex';
 
@@ -692,10 +674,8 @@
           }
         } catch (err) {
           console.error(err);
-          alert('Falha na comunicação com o servidor de Tokens OAuth (Possível bloqueio de CORS. A troca de token deve ocorrer num backend).');
+          alert('Falha na comunicação com o servidor da Deriv (Verifique se o seu App ID permite pedidos vindos do seu URL atual, restrição CORS).');
         }
-      } else {
-        if(oauthClientId) document.getElementById('oauth-client-id').value = oauthClientId;
       }
     }
 
@@ -1262,7 +1242,7 @@
 
     function connectWS() {
       if (ws) ws.close();
-      ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+      ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=' + MEU_APP_ID);
 
       ws.onopen = () => {
         statusBar.textContent = "Baixando Histórico (1/6)..."; statusBar.className = "";
