@@ -363,7 +363,6 @@
           <div class="input-group" style="margin-bottom: 8px;">
             <label style="color: var(--accent-green);">
               TIPO DE CATALOGAÇÃO (BASE):
-              <span class="help-icon" data-tooltip="Define se o sistema usará estratégias prontas automáticas ou um padrão livre montado por você.">?</span>
             </label>
             <select id="strategy_select" onchange="toggleStrategyMode()">
               <option value="MANUAL">Construtor Manual de Padrões (Livre)</option>
@@ -598,7 +597,7 @@
     let oldestEpochReceived = "latest";
 
     // --- VARIÁVEIS OAUTH 2.0 & TRADE ---
-    const MEU_APP_ID = '34tlOiTPkBhw0KUW9l1Pf'; // App ID (Ou Token de Cliente) fornecido
+    const MEU_APP_ID = '34tlOiTPkBhw0KUW9l1Pf';
     const OAUTH_AUTH_URL = 'https://auth.deriv.com/oauth2/auth';
     const OAUTH_TOKEN_URL = 'https://auth.deriv.com/oauth2/token';
     const redirectUri = window.location.origin + window.location.pathname;
@@ -708,7 +707,11 @@
       const accountId = document.getElementById('account-selector').value;
       const accInfo = accountsData.find(a => a.account_id === accountId);
       
-      if(accInfo) document.getElementById('acc-balance').innerText = `$ ${accInfo.balance.toFixed(2)}`;
+      if(accInfo) {
+        // Conversão do saldo para número antes do toFixed
+        const saldo = Number(accInfo.balance) || 0;
+        document.getElementById('acc-balance').innerText = `$ ${saldo.toFixed(2)}`;
+      }
 
       try {
         const res = await fetch(`https://api.derivws.com/trading/v1/options/accounts/${accountId}/otp`, {
@@ -1242,7 +1245,8 @@
 
     function connectWS() {
       if (ws) ws.close();
-      ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=' + MEU_APP_ID);
+      // Atualizado para a versão 1 sem app_id
+      ws = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
 
       ws.onopen = () => {
         statusBar.textContent = "Baixando Histórico (1/6)..."; statusBar.className = "";
