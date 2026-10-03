@@ -50,18 +50,6 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             background-color: #141822;
         }
-
-        /* Tabs da Area Operacional */
-        .op-tab {
-            flex: 1; text-align: center; padding: 12px; font-size: 14px;
-            font-weight: 800; color: var(--text-muted); cursor: pointer;
-            border-bottom: 3px solid transparent; transition: 0.2s;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .op-tab:hover { color: #f3f4f6; }
-        .op-tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-        
-        #area-robo { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-red-500 selection:text-white relative">
@@ -90,6 +78,7 @@
         </div>
         
         <div class="p-4 space-y-6">
+            <!-- Dados da Sessão -->
             <div class="bg-deriv-dark border border-deriv-border rounded-xl p-3 shadow-inner">
                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block"><i class="fa-solid fa-chart-line text-blue-400"></i> Dados da Sessão</span>
                 <div class="grid grid-cols-2 gap-2 text-center text-xs">
@@ -100,6 +89,7 @@
                 </div>
             </div>
 
+            <!-- Proporção Par vs Impar -->
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-deriv-accent"></i> Proporção Par vs Ímpar</span>
@@ -122,6 +112,7 @@
                 </div>
             </div>
 
+            <!-- Frequencia Digitos -->
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-chart-column text-emerald-400"></i> Frequência dos Dígitos</span>
@@ -129,6 +120,7 @@
                 <div class="grid grid-cols-5 gap-1.5" id="digitBarsGrid"></div>
             </div>
 
+            <!-- Historico Log -->
             <div class="flex-grow flex flex-col">
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-2">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Operações</span>
@@ -148,6 +140,7 @@
         </div>
     </div>
 
+    <!-- Botão Flutuante Lateral -->
     <button onclick="toggleDrawer()" class="fixed top-1/2 right-0 transform -translate-y-1/2 bg-deriv-border hover:bg-deriv-panel border border-r-0 border-deriv-border text-gray-300 p-2 rounded-l-xl z-50 shadow-lg flex flex-col items-center gap-2">
         <i class="fa-solid fa-chevron-left text-xs"></i>
         <span class="text-[10px] font-bold" style="writing-mode: vertical-rl;">ESTATÍSTICAS</span>
@@ -172,18 +165,6 @@
             </div>
 
             <div class="flex items-center flex-wrap gap-3">
-                
-                <!-- SELETOR DE CONTA NO HEADER PARA ACESSO RÁPIDO -->
-                <div class="flex items-center space-x-2 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
-                    <i class="fa-solid fa-user text-deriv-accent text-sm"></i>
-                    <select id="account-selector" onchange="switchAccountOTP()" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer">
-                        <option value="">Aguardando Conta...</option>
-                    </select>
-                    <div class="h-4 w-px bg-deriv-border mx-1"></div>
-                    <span id="deckBalanceText" class="text-emerald-400 mono font-extrabold text-sm px-1">$0.00</span>
-                    <button onclick="logoutDeriv()" class="text-xs text-rose-400 hover:text-rose-300 font-bold ml-1" title="Sair"><i class="fa-solid fa-power-off"></i></button>
-                </div>
-
                 <div class="flex items-center space-x-1.5 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
                     <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i>
                     <label for="historyRangeSelect" class="text-xs text-gray-400 font-semibold">Histórico API:</label>
@@ -232,255 +213,350 @@
 
     <main class="max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6 flex-grow">
 
-        <!-- ALTERAÇÃO DE LAYOUT: Painel Operacional à Esquerda (8 colunas) e Resultados à Direita (4 colunas) -->
+        <!-- ROW 1: CONTROLES E ÚLTIMOS RESULTADOS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- ESQUERDA: AREA OPERACIONAL UNIFICADA -->
-            <div class="lg:col-span-8 flex flex-col space-y-6">
+
+            <!-- LADO ESQUERDO: CONTROLES, TEMPORIZADOR, ABAS (MANUAL / ROBÔ) -->
+            <div class="lg:col-span-8 bg-gradient-to-r from-deriv-card via-deriv-panel to-deriv-card border-2 border-deriv-border rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all flex flex-col space-y-5">
                 
-                <!-- TABS MANUAL / ROBÔ -->
-                <div class="flex bg-deriv-card border border-deriv-border rounded-2xl overflow-hidden shadow-xl">
-                    <div class="op-tab active" id="tab-op-manual" onclick="switchAreaOperacional('manual')"><i class="fa-solid fa-hand-pointer mr-2"></i> Operação Manual</div>
-                    <div class="op-tab border-l border-deriv-border" id="tab-op-robo" onclick="switchAreaOperacional('robo')"><i class="fa-solid fa-robot mr-2"></i> Robô Autônomo</div>
+                <!-- TEMPORIZADOR FIXO -->
+                <div class="bg-deriv-dark/90 p-4 rounded-2xl border border-deriv-border/80 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 shadow-inner">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-gray-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="timerProgressRing" class="text-amber-400 transition-all duration-300" stroke-dasharray="100, 100" stroke-dashoffset="0" stroke-linecap="round" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="timerSecondsText" class="text-xl md:text-2xl font-black mono text-white tracking-tighter">--s</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Intervalo entre Rodadas</span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span id="windowStatusBadge" class="px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> JANELA ABERTA
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-1">Próxima avaliação em: <strong id="nextTargetSecond" class="text-white mono">00s</strong></p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- CONTAINER PRINCIPAL OPERACIONAL (Fundo com Gradiente) -->
-                <div class="bg-gradient-to-r from-deriv-card via-deriv-panel to-deriv-card border-2 border-deriv-border rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all min-h-[280px]">
+                <!-- CONTA E ABAS -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-deriv-dark/50 p-2 rounded-xl border border-deriv-border">
+                    <div class="flex items-center gap-2 px-2 w-full sm:w-auto justify-between sm:justify-start">
+                        <select id="account-selector" onchange="switchAccountOTP()" class="bg-deriv-dark text-xs font-bold text-white px-2 py-1.5 rounded border border-deriv-border focus:outline-none">
+                            <option value="">Selecione...</option>
+                        </select>
+                        <button onclick="logoutDeriv()" class="text-xs text-rose-400 hover:text-rose-300 font-bold ml-2"><i class="fa-solid fa-power-off"></i> Sair</button>
+                    </div>
                     
-                    <!-- CONTEÚDO: MANUAL -->
-                    <div id="area-manual" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full items-center">
-                        
-                        <!-- Lado Esquerdo do Manual: Timer e Stake -->
-                        <div class="flex flex-col justify-center space-y-6">
-                            
-                            <!-- RADIAL TIMER -->
-                            <div class="bg-deriv-dark/90 p-4 rounded-2xl border border-deriv-border/80 flex items-center justify-center shadow-inner">
-                                <div class="flex items-center space-x-4">
-                                    <div class="relative w-20 h-20 flex items-center justify-center">
-                                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                            <path class="text-gray-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                            <path id="timerProgressRing" class="text-amber-400 transition-all duration-300" stroke-dasharray="100, 100" stroke-dashoffset="0" stroke-linecap="round" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                        </svg>
-                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                            <span id="timerSecondsText" class="text-2xl font-black mono text-white tracking-tighter">--s</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Intervalo da Rodada</span>
-                                        <div class="flex items-center gap-1.5 mt-0.5">
-                                            <span id="windowStatusBadge" class="px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> JANELA ABERTA
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- STAKE MANUAL -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                                    <i class="fa-solid fa-coins text-amber-400"></i> Valor da Entrada ($)
-                                </label>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" id="quickInputStake" value="1.00" min="0.35" step="0.5" class="w-full bg-deriv-dark border-2 border-deriv-border rounded-xl px-3 py-3 text-white mono font-extrabold text-xl focus:outline-none focus:border-red-500 text-center">
-                                    <div class="flex flex-col gap-1">
-                                        <button onclick="multiplyStake(2.0)" class="px-3 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:bg-deriv-border text-xs font-bold text-amber-400 transition">x2</button>
-                                        <button onclick="multiplyStake(0.5)" class="px-3 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:bg-deriv-border text-xs font-bold text-gray-300 transition">/2</button>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="flex bg-deriv-dark p-1 rounded-xl border border-deriv-border w-full sm:w-64">
+                        <button id="tabManualBtn" onclick="switchTab('MANUAL')" class="flex-1 py-1.5 rounded-lg bg-deriv-card border border-amber-400 text-amber-400 text-sm font-bold transition shadow-sm">MANUAL</button>
+                        <button id="tabRoboBtn" onclick="switchTab('ROBO')" class="flex-1 py-1.5 rounded-lg bg-transparent border border-transparent text-gray-400 hover:text-white text-sm font-bold transition">ROBÔ</button>
+                    </div>
+                </div>
 
+                <!-- CONTEÚDO DA ABA: MANUAL -->
+                <div id="manualInterface" class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center flex-grow">
+                    <!-- CONTROLES DE STAKE -->
+                    <div class="md:col-span-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-coins text-amber-400"></i> Entrada ($)
+                            </label>
+                            <span class="text-[11px] text-gray-400">Saldo: <strong id="deckBalanceText" class="text-emerald-400 mono font-extrabold">$0.00</strong></span>
                         </div>
-
-                        <!-- Lado Direito do Manual: Botões de Entrada Gigantes e Simples -->
-                        <div class="flex flex-col gap-4 h-full justify-center relative">
-                            <!-- Aviso de Segurança Bloqueando os Botões -->
-                            <div id="lockoutWarningBanner" class="absolute inset-0 bg-deriv-dark/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-2xl border-2 border-rose-500/50 hidden">
-                                <i class="fa-solid fa-lock text-4xl text-rose-500 mb-2 animate-bounce"></i>
-                                <span class="text-rose-300 font-bold text-sm uppercase text-center px-4">AGUARDE<br>FECHAMENTO DA VELA</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="quickInputStake" value="1.00" min="0.35" step="0.5" class="w-full bg-deriv-dark border-2 border-deriv-border rounded-xl px-3 py-2 text-white mono font-extrabold text-base focus:outline-none focus:border-red-500 text-center">
+                            <div class="flex flex-col gap-1">
+                                <button onclick="multiplyStake(2.0)" class="px-2.5 py-0.5 rounded bg-deriv-dark border border-deriv-border hover:bg-deriv-border text-xs font-bold text-amber-400 transition">x2</button>
+                                <button onclick="multiplyStake(0.5)" class="px-2.5 py-0.5 rounded bg-deriv-dark border border-deriv-border hover:bg-deriv-border text-xs font-bold text-gray-300 transition">/2</button>
                             </div>
-
-                            <button onclick="placeFastBet('EVEN')" id="btnFastEven" class="flex-1 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 border-2 border-emerald-500/60 hover:border-emerald-400 hover:bg-emerald-500/30 text-emerald-300 font-black transition-all active:scale-95 flex items-center justify-center shadow-lg glow-even">
-                                <span class="text-3xl md:text-4xl font-black tracking-tight text-white drop-shadow-md">PAR</span>
-                            </button>
-                            <button onclick="placeFastBet('ODD')" id="btnFastOdd" class="flex-1 rounded-2xl bg-gradient-to-b from-purple-500/20 to-purple-600/30 border-2 border-purple-500/60 hover:border-purple-400 hover:bg-purple-500/30 text-purple-300 font-black transition-all active:scale-95 flex items-center justify-center shadow-lg glow-odd">
-                                <span class="text-3xl md:text-4xl font-black tracking-tight text-white drop-shadow-md">ÍMPAR</span>
-                            </button>
+                        </div>
+                        <div class="flex flex-wrap justify-between gap-1.5 pt-1">
+                            <button onclick="setQuickStake(1.00)" class="flex-1 px-1 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:border-amber-400 text-[11px] font-bold text-gray-300 transition">$1</button>
+                            <button onclick="setQuickStake(2.00)" class="flex-1 px-1 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:border-amber-400 text-[11px] font-bold text-gray-300 transition">$2</button>
+                            <button onclick="setQuickStake(5.00)" class="flex-1 px-1 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:border-amber-400 text-[11px] font-bold text-gray-300 transition">$5</button>
+                            <button onclick="setQuickStake(10.00)" class="flex-1 px-1 py-1.5 rounded-lg bg-deriv-dark border border-deriv-border hover:border-amber-400 text-[11px] font-bold text-gray-300 transition">$10</button>
                         </div>
                     </div>
 
-                    <!-- CONTEÚDO: ROBÔ (Oculto por Padrão) -->
-                    <div id="area-robo" class="flex flex-col h-full space-y-4">
-                        <div class="flex items-center justify-between border-b border-deriv-border pb-2">
-                            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-robot text-red-500"></i> Painel do Robô Autônomo
-                            </h3>
-                            <div class="flex items-center gap-3 bg-deriv-dark px-3 py-1.5 rounded-lg border border-deriv-border shadow-inner">
-                                <span class="text-xs font-bold text-gray-400">P&L:</span>
-                                <span id="simProfit" class="text-sm font-extrabold text-gray-300 mono">$0.00</span>
-                                <span class="text-xs font-bold text-gray-400 ml-2">Placar:</span>
-                                <span class="text-xs font-black text-emerald-400 mono" id="botPlacarWins">0W</span>
-                                <span class="text-xs font-black text-gray-500">x</span>
-                                <span class="text-xs font-black text-rose-400 mono" id="botPlacarLosses">0L</span>
-                            </div>
-                        </div>
+                    <!-- BOTÕES DE ENTRADA RÁPIDA -->
+                    <div class="md:col-span-7 grid grid-cols-2 gap-3 h-full">
+                        <button onclick="placeFastBet('EVEN')" id="btnFastEven" class="group relative py-4 px-4 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 border-2 border-emerald-500/60 hover:border-emerald-400 hover:bg-emerald-500/30 text-emerald-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-even h-full min-h-[120px]">
+                            <span id="labelFastEvenIcon" class="text-xs uppercase tracking-widest text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Entrar Manual</span>
+                            <span id="labelFastEvenText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-1">PAR</span>
+                        </button>
+                        <button onclick="placeFastBet('ODD')" id="btnFastOdd" class="group relative py-4 px-4 rounded-2xl bg-gradient-to-b from-purple-500/20 to-purple-600/30 border-2 border-purple-500/60 hover:border-purple-400 hover:bg-purple-500/30 text-purple-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-odd h-full min-h-[120px]">
+                            <span id="labelFastOddIcon" class="text-xs uppercase tracking-widest text-purple-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Entrar Manual</span>
+                            <span id="labelFastOddText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-1">ÍMPAR</span>
+                        </button>
+                    </div>
+                </div>
 
-                        <!-- Chave Principal de Ativação -->
-                        <div class="bg-deriv-dark p-3 rounded-xl border border-deriv-border flex items-center justify-between">
-                            <label class="font-black text-sm text-white flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" id="enableAutoBot" onchange="toggleAutoBotUI()" class="w-6 h-6 rounded bg-deriv-card border-deriv-border text-red-500 focus:ring-0 cursor-pointer">
+                <!-- CONTEÚDO DA ABA: ROBÔ -->
+                <div id="roboInterface" class="hidden flex-grow space-y-4">
+                    <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-robot text-red-500 text-base"></i>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Configuração do Robô Autônomo</h3>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 bg-deriv-dark px-3 py-1 rounded-lg border border-deriv-border shadow-inner">
+                            <span class="text-[10px] font-bold text-gray-400">Placar:</span>
+                            <span class="text-xs font-black text-emerald-400 mono" id="botPlacarWins">0W</span>
+                            <span class="text-xs font-black text-gray-500">x</span>
+                            <span class="text-xs font-black text-rose-400 mono" id="botPlacarLosses">0L</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+                        <div class="bg-deriv-dark p-2 rounded-xl border border-deriv-border"><span class="text-[10px] text-gray-400 uppercase font-semibold">Conta</span><p id="simBalance" class="text-sm font-extrabold text-white mt-0.5">Aguardando...</p></div>
+                        <div class="bg-deriv-dark p-2 rounded-xl border border-deriv-border"><span class="text-[10px] text-gray-400 uppercase font-semibold">Lucro (P&L)</span><p id="simProfit" class="text-sm font-extrabold text-gray-300 mono mt-0.5">$0.00</p></div>
+                        <div class="bg-deriv-dark p-2 rounded-xl border border-deriv-border flex items-center justify-between col-span-2">
+                            <label class="font-black text-[11px] text-white flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="enableAutoBot" onchange="toggleAutoBotUI()" class="w-4 h-4 rounded bg-deriv-card border-deriv-border text-red-500 focus:ring-0 cursor-pointer">
                                 <span>LIGAR ROBÔ AUTOMÁTICO</span>
                             </label>
-                            <span id="botStatusBadge" class="text-[10px] font-bold px-3 py-1 rounded bg-gray-800 text-gray-400 uppercase tracking-widest">DESLIGADO</span>
+                            <span id="botStatusBadge" class="text-[9px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase">DESLIGADO</span>
                         </div>
+                    </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                            <div><label class="block text-gray-300 font-bold mb-1">Stake ($):</label><input type="number" id="botInitialStake" value="1.00" min="0.35" step="0.5" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white mono font-bold focus:outline-none"></div>
-                            <div><label class="block text-gray-300 font-bold mb-1">Fator Gale:</label><input type="number" id="botGaleFactor" value="2.0" min="1.0" step="0.1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-amber-300 mono font-bold focus:outline-none"></div>
-                            <div><label class="block text-gray-300 font-bold mb-1">Máx. Gales:</label>
-                                <select id="botMaxGaleCount" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white font-bold focus:outline-none">
-                                    <option value="0">Sem Gale</option><option value="1">Até G1</option><option value="2" selected>Até G2</option><option value="3">Até G3</option><option value="4">Até G4</option>
+                    <div class="space-y-3 text-xs bg-deriv-panel/60 p-3 rounded-xl border border-deriv-border">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Stake Inicial ($):</label><input type="number" id="botInitialStake" value="1.00" min="0.35" step="0.5" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white mono font-extrabold focus:outline-none"></div>
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Fator Gale:</label><input type="number" id="botGaleFactor" value="2.0" min="1.0" step="0.1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-amber-300 mono font-extrabold focus:outline-none"></div>
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Máx. Gales:</label>
+                                <select id="botMaxGaleCount" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white font-extrabold focus:outline-none cursor-pointer">
+                                    <option value="0">0</option><option value="1">1 (G1)</option><option value="2" selected>2 (G2)</option><option value="3">3 (G3)</option><option value="4">4 (G4)</option>
                                 </select>
                             </div>
-                            <div><label class="block text-gray-300 font-bold mb-1">Gestão:</label>
-                                <select id="inputManagement" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white font-bold focus:outline-none">
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Gestão:</label>
+                                <select id="inputManagement" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white font-extrabold focus:outline-none cursor-pointer">
                                     <option value="MARTINGALE" selected>Martingale</option><option value="FLAT">Mão Fixa</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 text-xs pt-1">
-                            <div><label class="block text-gray-300 font-bold mb-1">Stop Loss ($):</label><input type="number" id="botStopLoss" value="50" min="1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-rose-400 mono font-bold"></div>
-                            <div><label class="block text-gray-300 font-bold mb-1">Meta Lucro ($):</label><input type="number" id="botTakeProfit" value="100" min="1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-emerald-400 mono font-bold"></div>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Stop Loss ($):</label><input type="number" id="botStopLoss" value="50" min="1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1 text-rose-400 mono font-extrabold"></div>
+                            <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Meta Lucro ($):</label><input type="number" id="botTakeProfit" value="100" min="1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1 text-emerald-400 mono font-extrabold"></div>
                         </div>
 
-                        <!-- Filtros Avançados (Colapsados em espaço menor) -->
-                        <div class="pt-2 border-t border-deriv-border/80 text-[11px]">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-shield-cat"></i> Filtros de Segurança do Robô</span>
+                        <div class="pt-2 border-t border-deriv-border/80 space-y-2 text-[10px]">
+                            <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border">
+                                <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer">
+                                    <input type="checkbox" id="botAntiSurfEnabled" checked class="w-3 h-3 rounded text-blue-500 focus:ring-0">
+                                    <span class="text-blue-300">Ativar Anti-Surf (Trancar estratégia até quebrar a zona)</span>
+                                </label>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border">
+
+                            <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border">
+                                <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer">
+                                    <input type="checkbox" id="botAntiHitEnabled" class="w-3 h-3 rounded text-rose-500 focus:ring-0">
+                                    <span class="text-rose-300">Filtro Hit (Abortar se os últimos</span>
+                                    <input type="number" id="botAntiHitTarget" value="3" min="1" max="10" class="w-10 bg-deriv-card border border-deriv-border rounded px-1 text-center font-extrabold text-white mono focus:outline-none">
+                                    <span class="text-rose-300">forem contrários)</span>
+                                </label>
+                            </div>
+
+                            <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border">
+                                <div class="flex items-center justify-between mb-1">
                                     <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer">
-                                        <input type="checkbox" id="botAntiSurfEnabled" checked class="w-3.5 h-3.5 rounded text-blue-500 focus:ring-0"><span class="text-blue-300">Anti-Surf (Aguardar Quebra)</span>
+                                        <input type="checkbox" id="botVirtualLossEnabled" onchange="updateFilterUIState()" class="w-3 h-3 rounded text-purple-500 focus:ring-0">
+                                        <span class="text-purple-300">Ativar Loss Virtual (Simulado)</span>
                                     </label>
+                                    <span id="vLossStatusBadgeTag" class="text-[8px] font-black px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase hidden"><i class="fa-solid fa-ghost"></i> <span id="vLossCounterText">Analisando: 0/1</span></span>
                                 </div>
-                                <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border flex items-center justify-between">
-                                    <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer">
-                                        <input type="checkbox" id="botAntiHitEnabled" class="w-3.5 h-3.5 rounded text-rose-500 focus:ring-0"><span class="text-rose-300">Abortar contra</span>
-                                    </label>
-                                    <div class="flex items-center gap-1"><input type="number" id="botAntiHitTarget" value="3" min="1" max="10" class="w-10 bg-deriv-card border border-deriv-border rounded text-center text-white mono focus:outline-none"><span class="text-gray-400">Opostos</span></div>
+                                <div id="virtualLossControls" class="flex flex-wrap items-center gap-2 pl-5">
+                                    <span class="text-gray-400">Espera tomar</span><input type="number" id="botVirtualLossTarget" value="1" min="1" class="w-10 bg-deriv-card border border-deriv-border rounded px-1 text-center font-extrabold text-purple-300 mono focus:outline-none"><span class="text-gray-400">Loss(es) virtual(is) p/ entrar</span>
+                                    <span class="text-gray-400 ml-2">Fará</span><input type="number" id="botRealEntriesTarget" value="1" min="1" class="w-10 bg-deriv-card border border-deriv-border rounded px-1 text-center font-extrabold text-emerald-300 mono focus:outline-none"><span class="text-gray-400">Entrada(s) reais.</span>
                                 </div>
-                                <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border md:col-span-2 flex flex-col gap-1">
-                                    <div class="flex items-center justify-between">
-                                        <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer"><input type="checkbox" id="botVirtualLossEnabled" onchange="updateFilterUIState()" class="w-3.5 h-3.5 rounded text-purple-500 focus:ring-0"><span class="text-purple-300">Ativar Loss Virtual (Testar na API antes)</span></label>
-                                        <span id="vLossStatusBadgeTag" class="text-[9px] font-black px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase hidden">Status: <span id="vLossCounterText">0/1</span></span>
-                                    </div>
-                                    <div id="virtualLossControls" class="flex flex-wrap items-center gap-2 opacity-50 pointer-events-none pl-6">
-                                        <span class="text-gray-400">Espera</span><input type="number" id="botVirtualLossTarget" value="1" min="1" class="w-10 bg-deriv-card border border-deriv-border rounded text-center text-purple-300 mono focus:outline-none"><span class="text-gray-400">Losses, e faz</span><input type="number" id="botRealEntriesTarget" value="1" min="1" class="w-10 bg-deriv-card border border-deriv-border rounded text-center text-emerald-300 mono focus:outline-none"><span class="text-gray-400">Entradas Reais.</span>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-deriv-border/80">
+                            <span class="text-[10px] font-extrabold text-gray-200 uppercase mb-1 flex items-center justify-between"><span class="flex items-center gap-1.5"><i class="fa-solid fa-list-check text-red-400"></i> Estratégias do Robô</span></span>
+                            <div id="botStrategyList" class="bg-deriv-dark rounded-xl border border-deriv-border p-1.5 space-y-1 max-h-32 overflow-y-auto">
+                                <div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo Validador ]</span></label></div>
                             </div>
                         </div>
                     </div>
+                    <button onclick="resetSimulator()" class="w-full py-1.5 text-[10px] text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5 mt-2">
+                        <i class="fa-solid fa-rotate-right"></i> Resetar Filtros
+                    </button>
                 </div>
 
-                <!-- Lista de Estratégias do Robô & Validador (Movido para baixo da Operação) -->
-                <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl">
-                    <div class="flex items-center justify-between border-b border-deriv-border pb-3 mb-4">
-                        <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-microchip text-amber-400"></i> Construtor de Estratégias (Validador)
-                        </span>
-                        <div class="flex items-center gap-2">
-                            <select id="catTargetBet" onchange="runStrategyCataloger()" class="bg-deriv-dark border border-deriv-border rounded-lg px-2.5 py-1 text-white font-bold text-xs focus:outline-none focus:border-amber-400 cursor-pointer">
-                                <option value="EVEN" selected>Alvo: PAR</option>
-                                <option value="ODD">Alvo: ÍMPAR</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="bg-deriv-dark p-3 rounded-xl border-2 border-deriv-border flex flex-wrap items-center justify-between gap-2 shadow-inner min-h-[50px] mb-3">
-                        <div class="flex items-center gap-2 flex-wrap" id="patternTokensDisplay"></div>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <button onclick="popBuilderToken()" class="px-2 py-1 rounded bg-deriv-card hover:bg-gray-800 text-gray-300 text-xs font-bold border border-deriv-border transition"><i class="fa-solid fa-delete-left text-amber-400"></i></button>
-                            <button onclick="clearBuilderTokens()" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold border border-rose-500/30 transition"><i class="fa-solid fa-rotate-right"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2 items-center mb-4 border-b border-deriv-border pb-3">
-                        <button onclick="addBuilderToken('EVEN')" class="flex-1 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-500/30 text-xs font-black transition shadow-sm">PAR</button>
-                        <button onclick="addBuilderToken('ODD')" class="flex-1 py-2 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/50 hover:bg-purple-500/30 text-xs font-black transition shadow-sm">ÍMPAR</button>
-                        <button onclick="addBuilderToken('ANY')" class="px-3 py-2 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50 hover:bg-blue-500/30 text-xs font-black transition shadow-sm"><i class="fa-solid fa-shuffle"></i> T. Faz</button>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-extrabold text-gray-300 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-list-check text-red-400"></i> Lista do Robô:</span>
-                        <button onclick="addStrategyToBot()" class="px-3 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-400 font-bold text-[10px] transition flex items-center gap-1">
-                            <i class="fa-solid fa-plus"></i> Salvar Estratégia
-                        </button>
-                    </div>
-                    <div id="botStrategyList" class="mt-2 bg-deriv-dark rounded-xl border border-deriv-border p-2 space-y-1.5 max-h-32 overflow-y-auto">
-                        <div class="flex items-center justify-between bg-deriv-card p-2 rounded-lg border border-deriv-border text-xs"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-4 h-4 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo no Validador Acima ]</span></label></div>
-                    </div>
+                <!-- AVISOS FIXOS -->
+                <div id="lockoutWarningBanner" class="hidden mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-lock text-rose-400 animate-bounce"></i><span>SEGURANÇA ATIVA: Entradas bloqueadas nos últimos 4s antes do fechamento!</span>
                 </div>
-
+                <div id="pendingBetAlert" class="hidden mt-2 p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center justify-between animate-pulse transition-all">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-base text-amber-400"></i>
+                        <span>ENTRADA CONFIRMADA: Apostando <strong id="pendingBetType" class="underline uppercase text-white">PAR</strong> no valor de <strong id="pendingBetAmount" class="mono text-white">$1.00</strong>. Aguardando a rodada...</span>
+                    </div>
+                    <span class="text-[10px] bg-amber-500 text-black px-2 py-0.5 rounded font-black">NA FILA</span>
+                </div>
             </div>
 
-            <!-- DIREITA: RESULTADOS / LIVE TICKS -->
-            <div class="lg:col-span-4 flex flex-col space-y-6">
-                <!-- Monitor de Ticks Ao Vivo -->
-                <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl">
+            <!-- LADO DIREITO: ÚLTIMOS RESULTADOS (Otimização de Espaço) -->
+            <div class="lg:col-span-4 bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4 relative overflow-hidden h-full">
+                <div>
                     <div class="flex items-center justify-between border-b border-deriv-border pb-3">
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-400"></i> Ticks</span>
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> Últimos Resultados
+                        </span>
                         <span id="historicalCountTag" class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-bold">0 Ticks</span>
                         <span id="symbolLabel" class="hidden">R_100</span>
                         <span id="spotPriceDisplay" class="hidden">---.--</span>
                     </div>
                     <div class="my-4 flex flex-col items-center justify-center gap-2">
-                        <div id="bigDigitContainer" class="w-24 h-24 rounded-2xl bg-deriv-dark border-2 border-deriv-border flex flex-col items-center justify-center transition-all duration-200">
-                            <span id="bigDigitValue" class="text-5xl font-black mono text-gray-400">-</span>
-                            <span id="bigDigitType" class="text-[10px] font-bold uppercase tracking-widest mt-1 text-gray-500">AGUARDANDO</span>
+                        <div id="bigDigitContainer" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-deriv-dark border-2 border-deriv-border flex flex-col items-center justify-center transition-all duration-200">
+                            <span id="bigDigitValue" class="text-4xl md:text-5xl font-black mono text-gray-400">-</span>
+                            <span id="bigDigitType" class="text-[10px] font-bold uppercase tracking-widest mt-1 text-gray-500">PAR/ÍMPAR</span>
                         </div>
-                        <p id="tickTime" class="text-[10px] text-gray-400 mono text-center">Iniciando...</p>
+                        <p id="tickTime" class="text-[10px] text-gray-400 mono text-center">Aguardando dados...</p>
                     </div>
-                    <div id="streakBanner" class="bg-deriv-dark/80 rounded-xl p-2.5 border border-deriv-border text-center flex items-center justify-center gap-2 shadow-inner">
+                    <div id="streakBanner" class="bg-deriv-dark/80 rounded-xl p-2.5 border border-deriv-border text-center flex items-center justify-center gap-2 shadow-inner mb-4">
                         <i class="fa-solid fa-fire text-amber-400 text-sm"></i>
-                        <span class="text-xs text-gray-300">Seq: <strong id="streakCountText" class="text-white">-</strong></span>
+                        <span class="text-xs text-gray-300">Sequência Atual: <strong id="streakCountText" class="text-white">Aguardando...</strong></span>
                     </div>
-                </div>
-
-                <!-- Estatísticas da Estratégia -->
-                <div class="bg-deriv-card border border-deriv-border rounded-2xl p-4 shadow-xl flex-grow">
-                    <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Assertividade Padrão</span>
-                        <span id="catQualityBadge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 uppercase">AGUARDANDO</span>
+                    <div class="flex items-center justify-between text-[10px] text-gray-400 px-1 mb-1">
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded border-2 border-amber-400 bg-amber-500/30"></span> Dourado</span>
+                        <span class="flex items-center gap-1"><span class="text-emerald-400 font-bold">[W]</span> Vitória</span>
+                        <span class="flex items-center gap-1"><span class="text-rose-400 font-bold">[L]</span> Derrota</span>
                     </div>
-                    
-                    <div class="flex items-end justify-between mb-4">
-                        <div>
-                            <span id="catWinRateText" class="text-3xl font-black text-emerald-400 mono">0.0%</span>
-                            <p class="text-[10px] text-gray-500 mt-1"><span id="catTotalSignalsText" class="text-white font-bold">0</span> Sinais Únicos</p>
+                    <div class="text-[9px] text-gray-500 text-center pb-1">
+                        Desenhando os máx 2000 blocos visuais.
+                    </div>
+                    <div class="pt-2 border-t border-deriv-border/60 flex-grow">
+                        <div id="digitMatrixGrid" class="flex flex-wrap gap-2 max-h-56 lg:max-h-80 overflow-y-auto p-1">
+                            <p class="text-gray-500 text-xs italic">A carregar dados históricos da Deriv...</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Vitórias / Derrotas</span>
-                            <div class="flex items-center justify-end gap-1">
-                                <span id="catWinsText" class="text-base font-black text-emerald-400 mono">0W</span>
-                                <span class="text-gray-500">/</span>
-                                <span id="catLossesText" class="text-base font-black text-rose-400 mono">0L</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2 text-center text-[10px]">
-                        <div class="bg-deriv-dark p-2 rounded-lg border border-deriv-border"><span class="text-gray-400 block mb-0.5">Win Direto</span><strong id="catWinDirectText" class="text-white text-sm mono">0</strong></div>
-                        <div class="bg-deriv-dark p-2 rounded-lg border border-deriv-border"><span class="text-blue-400 block mb-0.5">Win Gale 1</span><strong id="catWinG1Text" class="text-white text-sm mono">0</strong></div>
-                        <div class="bg-deriv-dark p-2 rounded-lg border border-deriv-border"><span class="text-amber-400 block mb-0.5">Win Gale 2</span><strong id="catWinG2Text" class="text-white text-sm mono">0</strong></div>
-                        <div class="bg-deriv-dark p-2 rounded-lg border border-deriv-border"><span class="text-rose-400 block mb-0.5">Hits (Loss)</span><strong id="catLossCountText" class="text-white text-sm mono">0</strong></div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- VALIDADOR DE PADRÕES -->
+        <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl flex flex-col justify-between mt-6">
+            <div>
+                <div class="flex items-center justify-between border-b border-deriv-border pb-3 mb-4">
+                    <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-amber-400 text-base"></i> Validador de Padrões
+                    </span>
+                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-extrabold">
+                        <i class="fa-solid fa-shield-cat text-[10px]"></i> BLOQUEIO DE SURF ATIVO
+                    </span>
+                </div>
+
+                <div class="space-y-4 mb-4">
+                    <div class="bg-deriv-dark p-3.5 rounded-2xl border-2 border-deriv-border/80 flex flex-wrap items-center justify-between gap-2 shadow-inner min-h-[64px]">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[11px] uppercase font-extrabold text-gray-400 mr-1 flex items-center gap-1"><i class="fa-solid fa-layer-group text-amber-400"></i> Padrão em Construção:</span>
+                            <div id="patternTokensDisplay" class="flex items-center gap-2 flex-wrap"></div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="popBuilderToken()" title="Apagar Última Pedra" class="px-3 py-1.5 rounded-xl bg-deriv-card hover:bg-gray-800 text-gray-300 text-xs font-bold border border-deriv-border transition active:scale-95 flex items-center gap-1"><i class="fa-solid fa-delete-left text-amber-400"></i> Apagar</button>
+                            <button onclick="clearBuilderTokens()" title="Limpar Tudo" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold border border-rose-500/30 transition active:scale-95 flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Limpar</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-deriv-panel/80 p-4 rounded-2xl border border-deriv-border space-y-3">
+                        <span class="text-[11px] uppercase font-bold text-gray-300 flex items-center gap-1.5"><i class="fa-solid fa-hand-pointer text-emerald-400"></i> Adicionar Pedra ao Padrão:</span>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
+                            <div class="md:col-span-5 grid grid-cols-3 gap-1.5">
+                                <button onclick="addBuilderToken('EVEN')" class="py-2.5 px-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border-2 border-emerald-500/50 hover:border-emerald-400 text-xs font-black transition active:scale-95 flex flex-col items-center justify-center gap-1 shadow-md"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span>PAR</span></button>
+                                <button onclick="addBuilderToken('ODD')" class="py-2.5 px-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-2 border-purple-500/50 hover:border-purple-400 text-xs font-black transition active:scale-95 flex flex-col items-center justify-center gap-1 shadow-md"><span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span><span>ÍMPAR</span></button>
+                                <button onclick="addBuilderToken('ANY')" class="py-2.5 px-1.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-2 border-blue-500/50 hover:border-blue-400 text-[11px] font-black transition active:scale-95 flex flex-col items-center justify-center gap-1 shadow-md"><i class="fa-solid fa-shuffle text-blue-400 text-xs"></i><span>TANTO FAZ</span></button>
+                            </div>
+                            <div class="md:col-span-7 bg-deriv-dark/70 p-2 rounded-xl border border-deriv-border flex items-center justify-around gap-1 flex-wrap">
+                                <button onclick="addBuilderToken('0')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-xs font-black transition shadow">0</button>
+                                <button onclick="addBuilderToken('1')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-purple-950 text-purple-400 border border-purple-500/40 text-xs font-black transition shadow">1</button>
+                                <button onclick="addBuilderToken('2')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-xs font-black transition shadow">2</button>
+                                <button onclick="addBuilderToken('3')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-purple-950 text-purple-400 border border-purple-500/40 text-xs font-black transition shadow">3</button>
+                                <button onclick="addBuilderToken('4')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-xs font-black transition shadow">4</button>
+                                <button onclick="addBuilderToken('5')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-purple-950 text-purple-400 border border-purple-500/40 text-xs font-black transition shadow">5</button>
+                                <button onclick="addBuilderToken('6')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-xs font-black transition shadow">6</button>
+                                <button onclick="addBuilderToken('7')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-purple-950 text-purple-400 border border-purple-500/40 text-xs font-black transition shadow">7</button>
+                                <button onclick="addBuilderToken('8')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-xs font-black transition shadow">8</button>
+                                <button onclick="addBuilderToken('9')" class="w-8 h-8 rounded-lg bg-deriv-card hover:bg-purple-950 text-purple-400 border border-purple-500/40 text-xs font-black transition shadow">9</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center pt-1">
+                        <div class="lg:col-span-3 space-y-1">
+                            <label class="text-[11px] font-bold text-gray-300 uppercase">Entrada Confirmada</label>
+                            <select id="catTargetBet" onchange="runStrategyCataloger()" class="w-full bg-deriv-dark border border-deriv-border rounded-xl px-2.5 py-2 text-white font-extrabold text-xs focus:outline-none focus:border-amber-400 cursor-pointer">
+                                <option value="EVEN" selected>Apostar PAR (EVEN)</option>
+                                <option value="ODD">Apostar ÍMPAR (ODD)</option>
+                            </select>
+                        </div>
+                        <div class="lg:col-span-3 space-y-1">
+                            <label class="text-[11px] font-bold text-gray-300 uppercase">Gale no Validador</label>
+                            <select id="catGaleSelect" onchange="runStrategyCataloger()" class="w-full bg-deriv-dark border border-deriv-border rounded-xl px-2.5 py-2 text-white font-extrabold text-xs focus:outline-none focus:border-amber-400 cursor-pointer">
+                                <option value="0">Sem Gale (Direto)</option>
+                                <option value="1">Até Gale 1 (G1)</option>
+                                <option value="2" selected>Até Gale 2 (G2)</option>
+                                <option value="3">Até Gale 3 (G3)</option>
+                            </select>
+                        </div>
+                        <div class="lg:col-span-3 space-y-1">
+                            <label class="text-[11px] font-bold text-gray-300 uppercase text-blue-400">Filtro Anti-Surf</label>
+                            <select id="catAntiSurfSelect" onchange="runStrategyCataloger()" class="w-full bg-deriv-dark border border-deriv-border rounded-xl px-2.5 py-2 text-white font-extrabold text-xs focus:outline-none focus:border-blue-400 cursor-pointer">
+                                <option value="ON" selected>Aguardar Quebra</option>
+                                <option value="OFF">Apenas Pular Ticks</option>
+                            </select>
+                        </div>
+                        <div class="lg:col-span-3 pt-2 sm:pt-0 flex flex-col justify-end">
+                            <button onclick="addStrategyToBot()" class="w-full h-10 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[11px] transition active:scale-95 flex items-center justify-center gap-1.5 shadow-lg glow-brand">
+                                <i class="fa-solid fa-robot text-sm"></i> Enviar ao Robô
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VALIDATOR METRICS -->
+                <div class="bg-deriv-dark p-4 rounded-xl border border-deriv-border space-y-3 shadow-inner">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center border-b border-deriv-border/60 pb-3">
+                        <div class="bg-deriv-card p-2.5 rounded-lg border border-deriv-border">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold block">Assertividade</span>
+                            <span id="catWinRateText" class="text-xl md:text-2xl font-black text-emerald-400 mono">0.0%</span>
+                            <span id="catQualityBadge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase">AGUARDANDO</span>
+                        </div>
+                        <div class="bg-deriv-card p-2.5 rounded-lg border border-deriv-border">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold block">Sinais Únicos</span>
+                            <span id="catTotalSignalsText" class="text-xl md:text-2xl font-black text-white mono">0</span>
+                        </div>
+                        <div class="bg-deriv-card p-2.5 rounded-lg border border-deriv-border">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold block">Placar (W/L)</span>
+                            <div class="flex items-center justify-center gap-2 mt-0.5">
+                                <span id="catWinsText" class="text-lg font-black text-emerald-400 mono">0W</span>
+                                <span class="text-gray-500 font-bold">/</span>
+                                <span id="catLossesText" class="text-lg font-black text-rose-400 mono">0L</span>
+                            </div>
+                        </div>
+                        <div class="bg-deriv-card p-2.5 rounded-lg border border-deriv-border">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold block">Último Loss</span>
+                            <span id="catLastLossTimeText" class="text-xs md:text-sm font-black text-amber-300 mono block mt-1">Nenhum Loss</span>
+                            <span id="catRoundsSinceLossText" class="text-[9px] text-emerald-400 font-bold">0 rodadas sem loss</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-center text-xs">
+                        <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20"><span class="text-[10px] text-emerald-400 uppercase font-extrabold block">Sem Gale (Direto)</span><strong id="catWinDirectText" class="text-white text-base mono">0</strong></div>
+                        <div class="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20"><span class="text-[10px] text-blue-400 uppercase font-extrabold block">Vitórias Gale 1</span><strong id="catWinG1Text" class="text-white text-base mono">0</strong></div>
+                        <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20"><span class="text-[10px] text-amber-400 uppercase font-extrabold block">Vitórias Gale 2</span><strong id="catWinG2Text" class="text-white text-base mono">0</strong></div>
+                        <div class="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20"><span class="text-[10px] text-rose-400 uppercase font-extrabold block">Losses (Hit)</span><strong id="catLossCountText" class="text-white text-base mono">0</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRADE HISTÓRICA DE MINUTOS -->
         <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl mt-6">
             <div class="flex items-center justify-between border-b border-deriv-border pb-3 mb-4">
                 <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
@@ -503,12 +579,14 @@
     <script>
         // CORE VARIABLES
         let ws = null;
-        let wsTrade = null; 
-        let wsPublicPingInterval = null;
-        let wsTradePingInterval = null; 
+        let wsTrade = null; // Autenticado
         let currentSymbol = 'R_100';
         let isSoundEnabled = true;
         const ALLOWED_SECONDS = [0, 20, 40];
+
+        // PING INTERVALS PARA EVITAR DESCONEXÃO DA DERIV
+        let wsPingInterval = null;
+        let wsTradePingInterval = null;
 
         // OAUTH
         const MEU_APP_ID = '34tlOiTPkBhw0KUW9l1Pf';
@@ -555,24 +633,8 @@
         // HISTÓRICO VARIÁVEIS
         let historyTotalRequested = 3600;
         let historyFetchedCount = 0;
-        let isFirstHistoryLoad = true;
 
-        // CONTROLO DE ABAS
-        function switchAreaOperacional(aba) {
-            document.getElementById('tab-op-manual').classList.remove('active');
-            document.getElementById('tab-op-robo').classList.remove('active');
-            document.getElementById(`tab-op-${aba}`).classList.add('active');
-
-            if (aba === 'manual') {
-                document.getElementById('area-manual').style.display = 'grid';
-                document.getElementById('area-robo').style.display = 'none';
-            } else {
-                document.getElementById('area-manual').style.display = 'none';
-                document.getElementById('area-robo').style.display = 'flex';
-            }
-        }
-
-        // OAUTH API LOGIN E CONTAS
+        // OAUTH API LOGIN
         async function startOAuthLogin() {
             const array = crypto.getRandomValues(new Uint8Array(64));
             const codeVerifier = Array.from(array).map(v => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v % 66]).join('');
@@ -628,8 +690,6 @@
                         fetchAccountsOAuth();
                     } else { alert('Erro ao processar o Token: ' + JSON.stringify(data)); }
                 } catch (err) { alert('Falha na comunicação com o servidor da Deriv.'); }
-            } else if (!derivAccessToken) {
-                // Deixa a tela de login visivel
             }
         }
 
@@ -640,11 +700,7 @@
                     headers: { 'Authorization': `Bearer ${derivAccessToken}` }
                 });
                 const data = await res.json();
-                
-                if(data.errors) {
-                    if (data.errors[0].status === 401) { logoutDeriv(); return; }
-                    return showToast("Erro ao carregar contas: " + data.errors[0].message, 'error');
-                }
+                if(data.errors) return showToast("Erro ao carregar contas: " + data.errors[0].message, 'error');
                 
                 accountsData = data.data;
                 const select = document.getElementById('account-selector');
@@ -669,6 +725,7 @@
                 if(initialRealBalance === 0) initialRealBalance = accountRealBalance;
                 
                 document.getElementById('deckBalanceText').innerText = `$ ${accountRealBalance.toFixed(2)}`;
+                document.getElementById('simBalance').innerText = `${accInfo.account_type.toUpperCase()}`;
             }
 
             try {
@@ -678,44 +735,63 @@
                 });
                 
                 const data = await res.json();
-                if(data.errors) {
-                    if (data.errors[0].status === 401) return logoutDeriv();
-                    return showToast("Erro ao obter OTP: " + data.errors[0].message, 'error');
-                }
+                if(data.errors) return showToast("Erro ao obter OTP: " + data.errors[0].message, 'error');
                 
                 if(wsTrade) wsTrade.close();
                 wsTrade = new WebSocket(data.data.url);
-                
                 wsTrade.onopen = () => { 
-                    showToast(`Conectado na conta: ${accountId}`, 'success'); 
-                    if(wsTradePingInterval) clearInterval(wsTradePingInterval);
+                    showToast(`Ligado para Operações na conta: ${accountId}`, 'success'); 
+                    
+                    // PING PARA MANTER A CONEXÃO DE OPERAÇÕES ESTÁVEL (10 segundos)
+                    if (wsTradePingInterval) clearInterval(wsTradePingInterval);
                     wsTradePingInterval = setInterval(() => {
-                        if(wsTrade && wsTrade.readyState === WebSocket.OPEN) wsTrade.send(JSON.stringify({ ping: 1 }));
-                    }, 15000); // 15 Segundos para evitar queda da Deriv
+                        if (wsTrade && wsTrade.readyState === WebSocket.OPEN) {
+                            wsTrade.send(JSON.stringify({ ping: 1 }));
+                        }
+                    }, 10000);
                 };
-                
-                wsTrade.onclose = () => {
-                    if(wsTradePingInterval) clearInterval(wsTradePingInterval);
-                    if(derivAccessToken) {
-                        showToast("Conexão da conta caiu. Reconectando...", "info");
-                        setTimeout(switchAccountOTP, 2000);
-                    }
-                };
-
                 wsTrade.onmessage = (event) => {
                     const msg = JSON.parse(event.data);
                     if(msg.msg_type === "buy") {
-                        showToast(`Ordem Aceita: ID ${msg.buy.contract_id}`, 'info');
+                        showToast(`Contrato Comprado: ID ${msg.buy.contract_id}`, 'info');
                     }
                 };
             } catch (err) { showToast("Erro na ligação ao WebSocket Autenticado.", 'error'); }
         }
 
         function logoutDeriv() {
-            derivAccessToken = '';
-            if(wsTradePingInterval) clearInterval(wsTradePingInterval);
             if(wsTrade) wsTrade.close();
+            if (wsTradePingInterval) clearInterval(wsTradePingInterval);
+            derivAccessToken = '';
             document.getElementById('login-overlay').style.display = 'flex';
+        }
+
+        // ALTERNÂNCIA DE ABAS MANUAL / ROBÔ
+        function switchTab(tab) {
+            const manualUI = document.getElementById('manualInterface');
+            const roboUI = document.getElementById('roboInterface');
+            const manualBtn = document.getElementById('tabManualBtn');
+            const roboBtn = document.getElementById('tabRoboBtn');
+
+            if (tab === 'MANUAL') {
+                manualUI.classList.remove('hidden');
+                roboUI.classList.add('hidden');
+                
+                manualBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
+                manualBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
+                
+                roboBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
+                roboBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
+            } else {
+                manualUI.classList.add('hidden');
+                roboUI.classList.remove('hidden');
+                
+                roboBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
+                roboBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
+                
+                manualBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
+                manualBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
+            }
         }
 
         // SOUND & TOASTS
@@ -779,27 +855,26 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('login-overlay').style.display = 'none'; // Prevenir travamento inicial caso OAuth demore
             updateGlobalSample();
             initDigitBars(); connectDerivWS(); startRoundCountdownTimer(); renderBuilderTokens(); renderBotStrategyList(); updateFilterUIState();
             
             document.getElementById('assetSelect').addEventListener('change', (e) => {
                 currentSymbol = e.target.value; document.getElementById('symbolLabel').innerText = currentSymbol;
-                isFirstHistoryLoad = true;
                 fetchHistoricalTicks(); showToast(`Ativo alterado para ${currentSymbol}`, 'info');
             });
             document.getElementById('quickInputStake').addEventListener('input', (e) => {
-                currentStake = parseFloat(e.target.value) || 1.0; updatePayoutDisplays();
+                currentStake = parseFloat(e.target.value) || 1.0; 
+                if(accountRealBalance > 0) document.getElementById('deckBalanceText').innerText = `$${accountRealBalance.toFixed(2)}`; 
             });
-            updatePayoutDisplays();
+            
             handleOAuthCallback();
         });
 
         // BOT VIRTUAL LOSS FILTERS
         function updateFilterUIState() {
             const vLossEnabled = document.getElementById('botVirtualLossEnabled').checked;
-            document.getElementById('virtualLossControls').className = vLossEnabled ? 'flex flex-wrap items-center gap-2 opacity-100 pl-6' : 'flex flex-wrap items-center gap-2 opacity-50 pointer-events-none pl-6';
-            document.getElementById('vLossStatusBadgeTag').className = vLossEnabled ? 'text-[9px] font-black px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase' : 'hidden';
+            document.getElementById('virtualLossControls').className = vLossEnabled ? 'flex flex-wrap items-center gap-2 pl-5 text-[10px]' : 'flex flex-wrap items-center gap-2 pl-5 text-[10px] opacity-50 pointer-events-none';
+            document.getElementById('vLossStatusBadgeTag').className = vLossEnabled ? 'text-[8px] font-black px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase' : 'hidden';
             if (vLossEnabled && botRealTradesLeft <= 0) { isBotInVirtualMode = true; }
             updateVirtualLossBadge();
         }
@@ -809,7 +884,7 @@
             const badge = document.getElementById('vLossCounterText');
             if (!badge) return;
             if (isBotInVirtualMode) { badge.innerHTML = `Analisando: ${botVirtualLossCount}/${target}`; } 
-            else if (botRealTradesLeft > 0) { badge.innerHTML = `Restam: ${botRealTradesLeft} Reais`; }
+            else if (botRealTradesLeft > 0) { badge.innerHTML = `Entrando Real. Restam: ${botRealTradesLeft}`; }
             else { badge.innerHTML = `Inativo`; }
         }
 
@@ -823,9 +898,9 @@
                 let bgStyle = '', label = '';
                 if (token === 'EVEN') { bgStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'; label = 'PAR'; }
                 else if (token === 'ODD') { bgStyle = 'bg-purple-500/20 text-purple-300 border-purple-500/50'; label = 'ÍMPAR'; }
-                else if (token === 'ANY') { bgStyle = 'bg-blue-500/20 text-blue-300 border-blue-500/50'; label = 'T. FAZ'; }
+                else if (token === 'ANY') { bgStyle = 'bg-blue-500/20 text-blue-300 border-blue-500/50'; label = 'TANTO FAZ'; }
                 else { const isEven = parseInt(token) % 2 === 0; bgStyle = isEven ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-purple-950 text-purple-300 border-purple-500/40'; label = `DÍGITO ${token}`; }
-                chip.className = `px-2.5 py-1 rounded-xl border text-[10px] font-black mono flex items-center gap-1.5 shadow-sm ${bgStyle}`;
+                chip.className = `px-2.5 py-1 rounded-xl border text-xs font-black mono flex items-center gap-1.5 shadow-sm ${bgStyle}`;
                 chip.innerHTML = `<span>${index + 1}. ${label}</span><button onclick="removeBuilderTokenAt(${index})" class="hover:text-rose-400 text-gray-400 transition ml-0.5" title="Remover pedra"><i class="fa-solid fa-xmark text-[10px]"></i></button>`;
                 container.appendChild(chip);
             });
@@ -848,9 +923,9 @@
 
         function renderBotStrategyList() {
             const listContainer = document.getElementById('botStrategyList'); if (!listContainer) return;
-            let html = `<div class="flex items-center justify-between bg-deriv-card p-2 rounded-lg border border-deriv-border text-xs"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-4 h-4 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo do Validador Acima ]</span></label></div>`;
+            let html = `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo Validador ]</span></label></div>`;
             savedRobotStrategies.forEach((strat) => {
-                html += `<div class="flex items-center justify-between bg-deriv-card p-2 rounded-lg border border-deriv-border text-xs"><label class="flex items-center gap-2 cursor-pointer font-semibold text-gray-200 flex-grow pr-2 truncate"><input type="checkbox" onchange="toggleStrategyEnabled('${strat.id}', this.checked)" ${strat.enabled ? 'checked' : ''} class="w-4 h-4 rounded bg-deriv-dark border-deriv-border text-red-500 focus:ring-0 cursor-pointer"><span class="truncate">${strat.name}</span></label><button onclick="deleteStrategyFromBot('${strat.id}')" class="p-1 text-gray-400 hover:text-rose-400 transition active:scale-95"><i class="fa-solid fa-trash-can text-xs"></i></button></div>`;
+                html += `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-semibold text-gray-200 flex-grow pr-2 truncate"><input type="checkbox" onchange="toggleStrategyEnabled('${strat.id}', this.checked)" ${strat.enabled ? 'checked' : ''} class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-red-500 focus:ring-0 cursor-pointer"><span class="truncate">${strat.name}</span></label><button onclick="deleteStrategyFromBot('${strat.id}')" class="p-1 text-gray-400 hover:text-rose-400 transition active:scale-95"><i class="fa-solid fa-trash-can text-xs"></i></button></div>`;
             });
             listContainer.innerHTML = html;
         }
@@ -871,7 +946,7 @@
                 const elapsedInCycle = 20 - remainingSecsFloat;
                 
                 document.getElementById('timerSecondsText').innerText = `${Math.ceil(remainingSecsFloat)}s`;
-                if(document.getElementById('nextTargetSecond')) document.getElementById('nextTargetSecond').innerText = `${targetSec === 60 ? '00' : targetSec}s`;
+                document.getElementById('nextTargetSecond').innerText = `${targetSec === 60 ? '00' : targetSec}s`;
                 document.getElementById('timerProgressRing').style.strokeDashoffset = 100 - ((elapsedInCycle / 20) * 100);
                 
                 setBettingLockout(remainingSecsFloat <= 4.0 && remainingSecsFloat > 0.1);
@@ -893,9 +968,13 @@
             isBettingLocked = locked;
             const btnE = document.getElementById('btnFastEven'), btnO = document.getElementById('btnFastOdd'), bnr = document.getElementById('lockoutWarningBanner');
             if (locked) {
-                btnE.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); btnO.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); bnr.classList.remove('hidden');
+                btnE.classList.add('opacity-50', 'cursor-not-allowed'); btnO.classList.add('opacity-50', 'cursor-not-allowed'); bnr.classList.remove('hidden');
+                document.getElementById('labelFastEvenIcon').innerHTML = `<i class="fa-solid fa-lock text-rose-400"></i> BLOQUEADO`;
+                document.getElementById('labelFastOddIcon').innerHTML = `<i class="fa-solid fa-lock text-rose-400"></i> BLOQUEADO`;
             } else {
-                btnE.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); btnO.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); bnr.classList.add('hidden');
+                btnE.classList.remove('opacity-50', 'cursor-not-allowed'); btnO.classList.remove('opacity-50', 'cursor-not-allowed'); bnr.classList.add('hidden');
+                document.getElementById('labelFastEvenIcon').innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i> Entrar Manual`;
+                document.getElementById('labelFastOddIcon').innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> Entrar Manual`;
             }
         }
 
@@ -904,14 +983,16 @@
             const b = document.getElementById('statusBadge'), t = document.getElementById('statusText');
             b.className = 'flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl text-amber-400 text-xs font-semibold'; t.innerText = 'Conectando WS...';
             
-            if(wsPublicPingInterval) clearInterval(wsPublicPingInterval);
-            
             ws = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
             ws.onopen = () => {
                 b.className = 'flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-emerald-400 text-xs font-semibold'; t.innerText = 'Conectado à API';
                 fetchHistoricalTicks();
                 
-                wsPublicPingInterval = setInterval(() => { if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 })); }, 15000);
+                // PING CONSTANTE PARA A API PÚBLICA (Evita Desconexão, Intervalo de 10s)
+                if (wsPingInterval) clearInterval(wsPingInterval);
+                wsPingInterval = setInterval(() => { 
+                    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 })); 
+                }, 10000);
             };
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
@@ -921,10 +1002,9 @@
             };
             ws.onerror = () => { b.className = 'flex items-center space-x-2 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-xl text-rose-400 text-xs font-semibold'; t.innerText = 'Erro na Conexão WS'; };
             ws.onclose = () => { 
-                b.className = 'flex items-center space-x-2 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-xl text-rose-400 text-xs font-semibold'; 
-                t.innerText = 'Desconectado - Reconectando...'; 
-                if(wsPublicPingInterval) clearInterval(wsPublicPingInterval);
-                setTimeout(connectDerivWS, 3000); 
+                if (wsPingInterval) clearInterval(wsPingInterval);
+                b.className = 'flex items-center space-x-2 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-xl text-rose-400 text-xs font-semibold'; t.innerText = 'Desconectado - Reconectando...'; 
+                setTimeout(connectDerivWS, 4000); 
             };
         }
 
@@ -934,13 +1014,9 @@
             ticksList = [];
             historyTotalRequested = parseInt(document.getElementById('historyRangeSelect').value) || 3600;
             historyFetchedCount = 0;
-            
-            // PRIMEIRO CARREGAMENTO RÁPIDO PARA DESTRAVAR TELA (Pede só 50 ticks iniciais)
-            let initialCount = isFirstHistoryLoad ? 50 : Math.min(historyTotalRequested, 5000);
-            isFirstHistoryLoad = false;
-            
+            const countRequest = Math.min(historyTotalRequested, 5000);
             showToast('Baixando dados da API...', 'info');
-            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: initialCount, subscribe: 1 }));
+            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: countRequest, subscribe: 1 }));
         }
 
         function handleHistoricalDataResponse(history) {
@@ -962,24 +1038,10 @@
             
             document.getElementById('historicalCountTag').innerText = `${ticksList.length} Ticks API`;
 
-            // SE AINDA FALTAM TICKS PARA BATER A META (E NÃO FOI SÓ UM TICK AVULSO)
             if (historyFetchedCount < historyTotalRequested && times.length > 1) {
-                
-                // RENDERIZA A TELA MESMO SEM TER TERMINADO PARA O USUARIO NAO FICAR OLHANDO PARA O NADA
-                if(ticksList.length > 0) {
-                    updateLiveTickDisplay(ticksList[0]);
-                    calculateStatistics(); runStrategyCataloger(); renderMinuteGrid(); 
-                }
-                
                 const remaining = historyTotalRequested - historyFetchedCount;
                 const nextCount = Math.min(remaining, 5000);
-                
-                // DELAY INTELIGENTE PARA NÃO CAIR NO RATE LIMIT (Too Many Requests) da Deriv
-                setTimeout(() => {
-                    if(ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ ticks_history: currentSymbol, end: times[0] - 1, style: 'ticks', count: nextCount }));
-                    }
-                }, 1500); 
+                ws.send(JSON.stringify({ ticks_history: currentSymbol, end: times[0] - 1, style: 'ticks', count: nextCount }));
             } else {
                 if (ticksList.length > 0) updateLiveTickDisplay(ticksList[0]);
                 calculateStatistics(); runStrategyCataloger(); 
@@ -1021,18 +1083,18 @@
             const container = document.getElementById('bigDigitContainer'), typeLabel = document.getElementById('bigDigitType');
             
             if (tick.isEven) {
-                container.className = 'w-24 h-24 rounded-2xl bg-deriv-even/10 border-2 border-deriv-even flex flex-col items-center justify-center transition-all duration-200 glow-even scale-105';
-                document.getElementById('bigDigitValue').className = 'text-5xl font-black mono text-deriv-even';
-                typeLabel.className = 'text-[10px] font-extrabold uppercase tracking-widest mt-1 text-deriv-even'; typeLabel.innerText = 'PAR (EVEN)';
+                container.className = 'w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-deriv-even/10 border-2 border-deriv-even flex flex-col items-center justify-center transition-all duration-200 glow-even scale-105';
+                document.getElementById('bigDigitValue').className = 'text-4xl md:text-5xl font-black mono text-deriv-even';
+                typeLabel.className = 'text-[10px] font-extrabold uppercase tracking-widest mt-1 text-deriv-even'; typeLabel.innerText = 'PAR';
             } else {
-                container.className = 'w-24 h-24 rounded-2xl bg-deriv-odd/10 border-2 border-deriv-odd flex flex-col items-center justify-center transition-all duration-200 glow-odd scale-105';
-                document.getElementById('bigDigitValue').className = 'text-5xl font-black mono text-deriv-odd';
-                typeLabel.className = 'text-[10px] font-extrabold uppercase tracking-widest mt-1 text-deriv-odd'; typeLabel.innerText = 'ÍMPAR (ODD)';
+                container.className = 'w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-deriv-odd/10 border-2 border-deriv-odd flex flex-col items-center justify-center transition-all duration-200 glow-odd scale-105';
+                document.getElementById('bigDigitValue').className = 'text-4xl md:text-5xl font-black mono text-deriv-odd';
+                typeLabel.className = 'text-[10px] font-extrabold uppercase tracking-widest mt-1 text-deriv-odd'; typeLabel.innerText = 'ÍMPAR';
             }
             setTimeout(() => container.classList.remove('scale-105'), 150);
 
             if (currentStreak.type === tick.isEven) currentStreak.count++; else { currentStreak.type = tick.isEven; currentStreak.count = 1; }
-            document.getElementById('streakCountText').innerHTML = `<span class="font-extrabold text-amber-400">${currentStreak.count}x ${currentStreak.type ? 'PAR' : 'ÍMPAR'}</span>`;
+            document.getElementById('streakCountText').innerHTML = `<span class="font-extrabold text-amber-400">${currentStreak.count}x ${currentStreak.type ? 'PAR' : 'ÍMPAR'}</span> consecutivos`;
         }
 
         function renderMinuteGrid() {
@@ -1084,8 +1146,9 @@
         }
 
         // CONTROLES DE ENTRADA MANUAL E REAL
+        function setQuickStake(amount) { currentStake = amount; document.getElementById('quickInputStake').value = amount.toFixed(2); playTone(800, 0.04); }
         function multiplyStake(factor) { currentStake = Math.max(0.35, currentStake * factor); document.getElementById('quickInputStake').value = currentStake.toFixed(2); playTone(850, 0.04); }
-
+        
         function placeFastBet(betType) {
             if (isBettingLocked) { showToast('Operações BLOQUEADAS nos últimos 4s!', 'error'); playTone(150, 0.2, 'sawtooth'); return; }
             if (pendingBet) { showToast('Já existe uma entrada agendada!', 'error'); return; }
@@ -1183,7 +1246,7 @@
             document.getElementById('catLossesText').innerText = `${totalLossesCat}L`; document.getElementById('catWinDirectText').innerText = directWins;
             document.getElementById('catWinG1Text').innerText = g1Wins; document.getElementById('catWinG2Text').innerText = g2Wins;
             document.getElementById('catLossCountText').innerText = totalLossesCat; document.getElementById('catLastLossTimeText').innerText = lastLossTime;
-            document.getElementById('catRoundsSinceLossText').innerText = `${roundsSinceLoss} rodadas sem loss`;
+            document.getElementById('catRoundsSinceLossText').innerText = `${roundsSinceLoss} sinal(is) desde o último loss`;
 
             const badge = document.getElementById('catQualityBadge');
             if (totalSignals === 0) { badge.className = 'text-[9px] font-black px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 uppercase'; badge.innerText = 'SEM SINAIS'; }
@@ -1259,7 +1322,7 @@
             }
             
             if (isBotRunning) {
-                badge.innerText = 'ROBÔ ATIVO'; badge.className = 'text-[10px] font-bold px-3 py-1 rounded bg-emerald-500 text-black uppercase animate-pulse';
+                badge.innerText = 'ROBÔ ATIVO'; badge.className = 'text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse';
                 botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
                 
                 const vLossEnabled = document.getElementById('botVirtualLossEnabled').checked;
@@ -1267,7 +1330,7 @@
 
                 showToast('Robô ativado na conta conectada!', 'success'); playTone(950, 0.15, 'triangle');
             } else {
-                badge.innerText = 'DESLIGADO'; badge.className = 'text-[10px] font-bold px-3 py-1 rounded bg-gray-800 text-gray-400 uppercase tracking-widest';
+                badge.innerText = 'DESLIGADO'; badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase';
                 showToast('Robô pausado', 'info');
             }
         }
@@ -1432,7 +1495,7 @@
                 }
             }
             pendingBet = null; document.getElementById('pendingBetAlert').classList.add('hidden');
-            updatePayoutDisplays(); updateStatsUI();
+            updateStatsUI();
         }
 
         function decrementRealTradeCount() {
@@ -1456,7 +1519,7 @@
 
         function updateStatsUI() {
             const p = accountRealBalance - initialRealBalance;
-            const el = document.getElementById('simProfit'); el.innerText = `${p >= 0 ? '+' : ''}$${p.toFixed(2)}`; el.className = p >= 0 ? 'text-sm font-extrabold text-emerald-400 mono' : 'text-sm font-extrabold text-rose-400 mono';
+            const el = document.getElementById('simProfit'); el.innerText = `${p >= 0 ? '+' : ''}$${p.toFixed(2)}`; el.className = p >= 0 ? 'text-sm font-extrabold text-emerald-400 mono mt-0.5' : 'text-sm font-extrabold text-rose-400 mono mt-0.5';
             
             document.getElementById('botPlacarWins').innerText = `${totalWins}W`;
             document.getElementById('botPlacarLosses').innerText = `${totalLosses}L`;
@@ -1471,7 +1534,7 @@
             document.getElementById('sessionCurWins').innerText = '0'; document.getElementById('sessionCurLosses').innerText = '0'; document.getElementById('sessionMaxLosses').innerText = '0'; document.getElementById('sessionMaxStake').innerText = '$0.00';
             botLastTradeEndEpoch.clear(); botSurfLocked.clear(); 
             if(document.getElementById('botVirtualLossEnabled').checked) { isBotInVirtualMode = true; botRealTradesLeft = 0; }
-            updatePayoutDisplays(); updateStatsUI(); updateVirtualLossBadge(); clearTradeLogs(); playTone(600, 0.1);
+            updateStatsUI(); updateVirtualLossBadge(); clearTradeLogs(); playTone(600, 0.1);
         }
     </script>
 </body>
