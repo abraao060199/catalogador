@@ -38,7 +38,6 @@
         .drawer-open { transform: translateX(0); }
         .drawer-closed { transform: translateX(100%); }
 
-        /* Login OAuth Overlay */
         #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(11, 15, 25, 0.95); display: flex; align-items: center;
@@ -50,11 +49,12 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             background-color: #141822;
         }
+        
+        #stratStatsModal { transition: opacity 0.3s; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-red-500 selection:text-white relative">
 
-    <!-- OVERLAY OAUTH LOGIN -->
     <div id="login-overlay">
         <div class="login-box">
             <h3 class="text-lg font-bold text-deriv-accent mb-2">Acesso API Deriv</h3>
@@ -67,10 +67,21 @@
         </div>
     </div>
 
-    <!-- OVERLAY DO DRAWER -->
+    <!-- STRATEGY STATS MODAL -->
+    <div id="stratStatsModal" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 w-full max-w-lg shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-deriv-border pb-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-chart-pie text-amber-400"></i> Raio-X da Estratégia</h3>
+                <button onclick="closeStratStats()" class="text-gray-400 hover:text-rose-400 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="stratStatsContent" class="space-y-4">
+                <!-- Conteúdo gerado dinamicamente via JS -->
+            </div>
+        </div>
+    </div>
+
     <div id="drawerOverlay" onclick="toggleDrawer()" class="fixed inset-0 bg-black/60 z-[60] hidden backdrop-blur-sm transition-opacity"></div>
 
-    <!-- DRAWER LATERAL (ESTATÍSTICAS E HISTÓRICO) -->
     <div id="sideDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-deriv-card border-l border-deriv-border z-[70] drawer-closed flex flex-col shadow-2xl overflow-y-auto">
         <div class="p-4 border-b border-deriv-border flex items-center justify-between sticky top-0 bg-deriv-card/95 backdrop-blur z-10">
             <h2 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-chart-pie text-amber-400"></i> Estatísticas & Histórico</h2>
@@ -78,7 +89,6 @@
         </div>
         
         <div class="p-4 space-y-6">
-            <!-- Dados da Sessão -->
             <div class="bg-deriv-dark border border-deriv-border rounded-xl p-3 shadow-inner">
                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block"><i class="fa-solid fa-chart-line text-blue-400"></i> Dados da Sessão</span>
                 <div class="grid grid-cols-2 gap-2 text-center text-xs">
@@ -89,7 +99,6 @@
                 </div>
             </div>
 
-            <!-- Proporção Par vs Impar -->
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-deriv-accent"></i> Proporção Par vs Ímpar</span>
@@ -112,7 +121,6 @@
                 </div>
             </div>
 
-            <!-- Frequencia Digitos -->
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-chart-column text-emerald-400"></i> Frequência dos Dígitos</span>
@@ -120,7 +128,6 @@
                 <div class="grid grid-cols-5 gap-1.5" id="digitBarsGrid"></div>
             </div>
 
-            <!-- Historico Log -->
             <div class="flex-grow flex flex-col">
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-2">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Operações</span>
@@ -140,7 +147,6 @@
         </div>
     </div>
 
-    <!-- Botão Flutuante Lateral -->
     <button onclick="toggleDrawer()" class="fixed top-1/2 right-0 transform -translate-y-1/2 bg-deriv-border hover:bg-deriv-panel border border-r-0 border-deriv-border text-gray-300 p-2 rounded-l-xl z-50 shadow-lg flex flex-col items-center gap-2">
         <i class="fa-solid fa-chevron-left text-xs"></i>
         <span class="text-[10px] font-bold" style="writing-mode: vertical-rl;">ESTATÍSTICAS</span>
@@ -165,17 +171,8 @@
             </div>
 
             <div class="flex items-center flex-wrap gap-3">
-                <div class="flex items-center space-x-1.5 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i>
-                    <label for="historyRangeSelect" class="text-xs text-gray-400 font-semibold">Histórico API:</label>
-                    <select id="historyRangeSelect" onchange="fetchHistoricalTicks()" class="bg-transparent text-xs font-bold text-amber-300 focus:outline-none cursor-pointer">
-                        <option value="1800" class="bg-deriv-card">30 Minutos</option>
-                        <option value="3600" selected class="bg-deriv-card">1 Hora</option>
-                        <option value="7200" class="bg-deriv-card">2 Horas</option>
-                        <option value="14400" class="bg-deriv-card">4 Horas</option>
-                    </select>
-                </div>
-
+                <!-- Dropdown de "Histórico API" removido, pois o sistema sempre puxa os 5000 máximos agora. -->
+                
                 <div class="flex items-center space-x-1.5 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
                     <i class="fa-solid fa-chart-pie text-emerald-400 text-xs"></i>
                     <label for="globalSampleSelect" class="text-xs text-gray-400 font-semibold">Analisar Ticks:</label>
@@ -213,13 +210,12 @@
 
     <main class="max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6 flex-grow">
 
-        <!-- ROW 1: CONTROLES E ÚLTIMOS RESULTADOS -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- ROW 1: CONTROLES E ÚLTIMOS RESULTADOS COM ITEMS-START PARA NÃO ESTICAREM MÚTUAMENTE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             <!-- LADO ESQUERDO: CONTROLES, TEMPORIZADOR, ABAS (MANUAL / ROBÔ) -->
             <div class="lg:col-span-8 bg-gradient-to-r from-deriv-card via-deriv-panel to-deriv-card border-2 border-deriv-border rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all flex flex-col space-y-5">
                 
-                <!-- TEMPORIZADOR FIXO -->
                 <div class="bg-deriv-dark/90 p-4 rounded-2xl border border-deriv-border/80 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 shadow-inner">
                     <div class="flex items-center space-x-4">
                         <div class="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
@@ -243,7 +239,6 @@
                     </div>
                 </div>
 
-                <!-- CONTA E ABAS -->
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-deriv-dark/50 p-2 rounded-xl border border-deriv-border">
                     <div class="flex items-center gap-2 px-2 w-full sm:w-auto justify-between sm:justify-start">
                         <select id="account-selector" onchange="switchAccountOTP()" class="bg-deriv-dark text-xs font-bold text-white px-2 py-1.5 rounded border border-deriv-border focus:outline-none">
@@ -260,7 +255,6 @@
 
                 <!-- CONTEÚDO DA ABA: MANUAL -->
                 <div id="manualInterface" class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center flex-grow">
-                    <!-- CONTROLES DE STAKE -->
                     <div class="md:col-span-5 space-y-3">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -283,15 +277,15 @@
                         </div>
                     </div>
 
-                    <!-- BOTÕES DE ENTRADA RÁPIDA -->
-                    <div class="md:col-span-7 grid grid-cols-2 gap-3 h-full">
-                        <button onclick="placeFastBet('EVEN')" id="btnFastEven" class="group relative py-4 px-4 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 border-2 border-emerald-500/60 hover:border-emerald-400 hover:bg-emerald-500/30 text-emerald-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-even h-full min-h-[120px]">
+                    <!-- Botões sem altura forçada para não esticarem -->
+                    <div class="md:col-span-7 grid grid-cols-2 gap-3">
+                        <button onclick="placeFastBet('EVEN')" id="btnFastEven" class="group relative py-6 px-4 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 border-2 border-emerald-500/60 hover:border-emerald-400 hover:bg-emerald-500/30 text-emerald-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-even">
                             <span id="labelFastEvenIcon" class="text-xs uppercase tracking-widest text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Entrar Manual</span>
-                            <span id="labelFastEvenText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-1">PAR</span>
+                            <span id="labelFastEvenText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-2">PAR</span>
                         </button>
-                        <button onclick="placeFastBet('ODD')" id="btnFastOdd" class="group relative py-4 px-4 rounded-2xl bg-gradient-to-b from-purple-500/20 to-purple-600/30 border-2 border-purple-500/60 hover:border-purple-400 hover:bg-purple-500/30 text-purple-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-odd h-full min-h-[120px]">
+                        <button onclick="placeFastBet('ODD')" id="btnFastOdd" class="group relative py-6 px-4 rounded-2xl bg-gradient-to-b from-purple-500/20 to-purple-600/30 border-2 border-purple-500/60 hover:border-purple-400 hover:bg-purple-500/30 text-purple-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-odd">
                             <span id="labelFastOddIcon" class="text-xs uppercase tracking-widest text-purple-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Entrar Manual</span>
-                            <span id="labelFastOddText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-1">ÍMPAR</span>
+                            <span id="labelFastOddText" class="text-2xl md:text-3xl font-black tracking-tight text-white mt-2">ÍMPAR</span>
                         </button>
                     </div>
                 </div>
@@ -389,7 +383,6 @@
                     </button>
                 </div>
 
-                <!-- AVISOS FIXOS -->
                 <div id="lockoutWarningBanner" class="hidden mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
                     <i class="fa-solid fa-lock text-rose-400 animate-bounce"></i><span>SEGURANÇA ATIVA: Entradas bloqueadas nos últimos 4s antes do fechamento!</span>
                 </div>
@@ -402,7 +395,7 @@
                 </div>
             </div>
 
-            <!-- LADO DIREITO: ÚLTIMOS RESULTADOS (Otimização de Espaço) -->
+            <!-- LADO DIREITO: ÚLTIMOS RESULTADOS -->
             <div class="lg:col-span-4 bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4 relative overflow-hidden h-full">
                 <div>
                     <div class="flex items-center justify-between border-b border-deriv-border pb-3">
@@ -441,7 +434,6 @@
             </div>
         </div>
 
-        <!-- VALIDADOR DE PADRÕES -->
         <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl flex flex-col justify-between mt-6">
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-3 mb-4">
@@ -492,8 +484,8 @@
                         <div class="lg:col-span-3 space-y-1">
                             <label class="text-[11px] font-bold text-gray-300 uppercase">Entrada Confirmada</label>
                             <select id="catTargetBet" onchange="runStrategyCataloger()" class="w-full bg-deriv-dark border border-deriv-border rounded-xl px-2.5 py-2 text-white font-extrabold text-xs focus:outline-none focus:border-amber-400 cursor-pointer">
-                                <option value="EVEN" selected>Apostar PAR (EVEN)</option>
-                                <option value="ODD">Apostar ÍMPAR (ODD)</option>
+                                <option value="EVEN" selected>Apostar PAR</option>
+                                <option value="ODD">Apostar ÍMPAR</option>
                             </select>
                         </div>
                         <div class="lg:col-span-3 space-y-1">
@@ -520,7 +512,6 @@
                     </div>
                 </div>
 
-                <!-- VALIDATOR METRICS -->
                 <div class="bg-deriv-dark p-4 rounded-xl border border-deriv-border space-y-3 shadow-inner">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center border-b border-deriv-border/60 pb-3">
                         <div class="bg-deriv-card p-2.5 rounded-lg border border-deriv-border">
@@ -556,7 +547,6 @@
             </div>
         </div>
 
-        <!-- GRADE HISTÓRICA DE MINUTOS -->
         <div class="bg-deriv-card border border-deriv-border rounded-2xl p-5 shadow-xl mt-6">
             <div class="flex items-center justify-between border-b border-deriv-border pb-3 mb-4">
                 <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
@@ -567,7 +557,6 @@
             
             <div class="overflow-x-auto w-full pb-2">
                 <div id="minuteGridContainer" class="flex gap-2.5 min-w-max">
-                    <!-- O JavaScript vai gerar e empurrar as colunas em blocos a cada 10 min -->
                 </div>
             </div>
         </div>
@@ -579,7 +568,7 @@
     <script>
         // CORE VARIABLES
         let ws = null;
-        let wsTrade = null; // Autenticado
+        let wsTrade = null; 
         let currentSymbol = 'R_100';
         let isSoundEnabled = true;
         const ALLOWED_SECONDS = [0, 20, 40];
@@ -629,10 +618,6 @@
         let botLastTradeEndEpoch = new Map();
         let botSurfLocked = new Map();
         let audioCtx = null;
-
-        // HISTÓRICO VARIÁVEIS
-        let historyTotalRequested = 3600;
-        let historyFetchedCount = 0;
 
         // OAUTH API LOGIN
         async function startOAuthLogin() {
@@ -742,7 +727,6 @@
                 wsTrade.onopen = () => { 
                     showToast(`Ligado para Operações na conta: ${accountId}`, 'success'); 
                     
-                    // PING PARA MANTER A CONEXÃO DE OPERAÇÕES ESTÁVEL (10 segundos)
                     if (wsTradePingInterval) clearInterval(wsTradePingInterval);
                     wsTradePingInterval = setInterval(() => {
                         if (wsTrade && wsTrade.readyState === WebSocket.OPEN) {
@@ -766,7 +750,6 @@
             document.getElementById('login-overlay').style.display = 'flex';
         }
 
-        // ALTERNÂNCIA DE ABAS MANUAL / ROBÔ
         function switchTab(tab) {
             const manualUI = document.getElementById('manualInterface');
             const roboUI = document.getElementById('roboInterface');
@@ -774,27 +757,20 @@
             const roboBtn = document.getElementById('tabRoboBtn');
 
             if (tab === 'MANUAL') {
-                manualUI.classList.remove('hidden');
-                roboUI.classList.add('hidden');
-                
+                manualUI.classList.remove('hidden'); roboUI.classList.add('hidden');
                 manualBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
                 manualBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
-                
                 roboBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
                 roboBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
             } else {
-                manualUI.classList.add('hidden');
-                roboUI.classList.remove('hidden');
-                
+                manualUI.classList.add('hidden'); roboUI.classList.remove('hidden');
                 roboBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
                 roboBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
-                
                 manualBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
                 manualBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
             }
         }
 
-        // SOUND & TOASTS
         function playTone(freq, duration = 0.1, type = 'sine') {
             if (!isSoundEnabled) return;
             try {
@@ -854,9 +830,22 @@
             return isNaN(val) ? 0 : val;
         }
 
+        // SALVAMENTO DE ESTRATÉGIAS
+        function loadStrategies() {
+            const saved = localStorage.getItem('deriv_bot_strategies_pro');
+            if (saved) {
+                try { savedRobotStrategies = JSON.parse(saved); } catch(e) { savedRobotStrategies = []; }
+            }
+            renderBotStrategyList();
+        }
+
+        function saveStrategies() {
+            localStorage.setItem('deriv_bot_strategies_pro', JSON.stringify(savedRobotStrategies));
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             updateGlobalSample();
-            initDigitBars(); connectDerivWS(); startRoundCountdownTimer(); renderBuilderTokens(); renderBotStrategyList(); updateFilterUIState();
+            initDigitBars(); connectDerivWS(); startRoundCountdownTimer(); renderBuilderTokens(); loadStrategies(); updateFilterUIState();
             
             document.getElementById('assetSelect').addEventListener('change', (e) => {
                 currentSymbol = e.target.value; document.getElementById('symbolLabel').innerText = currentSymbol;
@@ -870,7 +859,6 @@
             handleOAuthCallback();
         });
 
-        // BOT VIRTUAL LOSS FILTERS
         function updateFilterUIState() {
             const vLossEnabled = document.getElementById('botVirtualLossEnabled').checked;
             document.getElementById('virtualLossControls').className = vLossEnabled ? 'flex flex-wrap items-center gap-2 pl-5 text-[10px]' : 'flex flex-wrap items-center gap-2 pl-5 text-[10px] opacity-50 pointer-events-none';
@@ -888,7 +876,6 @@
             else { badge.innerHTML = `Inativo`; }
         }
 
-        // VALIDATOR BUILDER
         function renderBuilderTokens() {
             const container = document.getElementById('patternTokensDisplay'); if (!container) return;
             if (builderTokens.length === 0) { container.innerHTML = `<span class="text-xs text-gray-500 italic">Nenhuma pedra adicionada...</span>`; runStrategyCataloger(); return; }
@@ -917,23 +904,158 @@
             const targetBet = document.getElementById('catTargetBet').value;
             const tokensSummary = builderTokens.map(t => t === 'EVEN' ? 'PAR' : t === 'ODD' ? 'ÍMPAR' : t === 'ANY' ? 'TANTO FAZ' : t).join(' -> ');
             const stratObj = { id: 'STRAT_' + Date.now(), name: `[ ${tokensSummary} ] => ${targetBet === 'EVEN' ? 'PAR' : 'ÍMPAR'}`, tokens: [...builderTokens], targetBet: targetBet, enabled: true };
-            savedRobotStrategies.push(stratObj); renderBotStrategyList();
-            showToast(`Estratégia adicionada à lista do Robô!`, 'success'); playTone(900, 0.15, 'triangle');
+            savedRobotStrategies.push(stratObj); 
+            saveStrategies(); renderBotStrategyList();
+            showToast(`Estratégia salva na lista do Robô!`, 'success'); playTone(900, 0.15, 'triangle');
         }
 
         function renderBotStrategyList() {
             const listContainer = document.getElementById('botStrategyList'); if (!listContainer) return;
             let html = `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo Validador ]</span></label></div>`;
             savedRobotStrategies.forEach((strat) => {
-                html += `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-semibold text-gray-200 flex-grow pr-2 truncate"><input type="checkbox" onchange="toggleStrategyEnabled('${strat.id}', this.checked)" ${strat.enabled ? 'checked' : ''} class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-red-500 focus:ring-0 cursor-pointer"><span class="truncate">${strat.name}</span></label><button onclick="deleteStrategyFromBot('${strat.id}')" class="p-1 text-gray-400 hover:text-rose-400 transition active:scale-95"><i class="fa-solid fa-trash-can text-xs"></i></button></div>`;
+                html += `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]">
+                    <label class="flex items-center gap-2 cursor-pointer font-semibold text-gray-200 flex-grow pr-2 truncate"><input type="checkbox" onchange="toggleStrategyEnabled('${strat.id}', this.checked)" ${strat.enabled ? 'checked' : ''} class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-red-500 focus:ring-0 cursor-pointer"><span class="truncate">${strat.name}</span></label>
+                    <div class="flex items-center gap-1">
+                        <button onclick="showStratStats('${strat.id}')" title="Ver Estatísticas" class="p-1 text-blue-400 hover:text-blue-300 transition active:scale-95"><i class="fa-solid fa-chart-simple text-xs"></i></button>
+                        <button onclick="deleteStrategyFromBot('${strat.id}')" title="Excluir" class="p-1 text-gray-400 hover:text-rose-400 transition active:scale-95"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                </div>`;
             });
             listContainer.innerHTML = html;
         }
 
-        function toggleStrategyEnabled(stratId, isChecked) { const strat = savedRobotStrategies.find(s => s.id === stratId); if (strat) strat.enabled = isChecked; }
-        function deleteStrategyFromBot(stratId) { savedRobotStrategies = savedRobotStrategies.filter(s => s.id !== stratId); renderBotStrategyList(); }
+        function toggleStrategyEnabled(stratId, isChecked) { const strat = savedRobotStrategies.find(s => s.id === stratId); if (strat) { strat.enabled = isChecked; saveStrategies(); } }
+        function deleteStrategyFromBot(stratId) { savedRobotStrategies = savedRobotStrategies.filter(s => s.id !== stratId); saveStrategies(); renderBotStrategyList(); }
 
-        // TIMER
+        // EXIBIR ESTATÍSTICAS DA ESTRATÉGIA NO MODAL
+        function showStratStats(stratId) {
+            const strat = savedRobotStrategies.find(s => s.id === stratId);
+            if (!strat) return;
+
+            const sampleTicks = ticksList.slice(0, Math.min(globalSampleSize, ticksList.length)).reverse();
+            const totalTicks = sampleTicks.length;
+            const patternLen = strat.tokens.length;
+            
+            let totalSignals = 0, wins = 0, losses = 0;
+            let currentWinStreak = 0, maxWinStreak = 0;
+            let currentLossStreak = 0, maxLossStreak = 0;
+            let directWins = 0, g1Wins = 0, g2Wins = 0, g3PlusWins = 0;
+            const botMaxGale = parseInt(document.getElementById('botMaxGaleCount').value) || 2; 
+            
+            let i = 0;
+            const results = [];
+            
+            while (i <= totalTicks - patternLen - 1) {
+                let isMatch = true;
+                for (let p = 0; p < patternLen; p++) {
+                    const token = strat.tokens[p], tick = sampleTicks[i + p];
+                    if (token === 'EVEN' && !tick.isEven) { isMatch = false; break; }
+                    if (token === 'ODD' && tick.isEven) { isMatch = false; break; }
+                    if (token !== 'ANY' && token !== 'EVEN' && token !== 'ODD' && !isNaN(token) && tick.digit !== parseInt(token)) { isMatch = false; break; }
+                }
+
+                if (isMatch) {
+                    totalSignals++;
+                    let entryIdx = i + patternLen, signalWon = false, galeUsed = -1;
+                    
+                    for (let g = 0; g <= 4; g++) { // Analisa até o Gale 4 nas estatísticas
+                        if (entryIdx + g < totalTicks) {
+                            const oTick = sampleTicks[entryIdx + g];
+                            if ((strat.targetBet === 'EVEN' && oTick.isEven) || (strat.targetBet === 'ODD' && !oTick.isEven)) { signalWon = true; galeUsed = g; break; }
+                        }
+                    }
+
+                    results.push({ won: signalWon, gale: galeUsed });
+                    i += patternLen + (signalWon ? galeUsed + 1 : 5); // Assumindo máximo de 4 gales (5 tickets no total) para continuar a busca se não der Hit
+                } else {
+                    i++;
+                }
+            }
+
+            results.forEach(r => {
+                if (r.won && r.gale <= botMaxGale) { // Conta Win apenas se foi dentro do nível de Gale definido
+                    wins++;
+                    currentWinStreak++;
+                    maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
+                    currentLossStreak = 0;
+                    
+                    if (r.gale === 0) directWins++;
+                    else if (r.gale === 1) g1Wins++;
+                    else if (r.gale === 2) g2Wins++;
+                    else g3PlusWins++;
+                } else {
+                    losses++;
+                    currentLossStreak++;
+                    maxLossStreak = Math.max(maxLossStreak, currentLossStreak);
+                    currentWinStreak = 0;
+                }
+            });
+
+            const winRate = totalSignals > 0 ? ((wins / totalSignals) * 100).toFixed(1) : 0;
+            
+            const modal = document.getElementById('stratStatsModal');
+            const content = document.getElementById('stratStatsContent');
+            
+            content.innerHTML = `
+                <div class="bg-deriv-dark p-3 rounded-xl border border-deriv-border">
+                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Estratégia</p>
+                    <p class="text-sm font-black text-amber-300">${strat.name}</p>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border shadow-inner">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block">Sinais</span>
+                        <span class="text-xl font-black text-white mono">${totalSignals}</span>
+                    </div>
+                    <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border shadow-inner">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block">Assert.</span>
+                        <span class="text-xl font-black text-emerald-400 mono">${winRate}%</span>
+                    </div>
+                    <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border shadow-inner">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block">Placar</span>
+                        <div class="flex items-center justify-center mt-1">
+                            <span class="text-lg font-black text-emerald-400 mono">${wins}</span>
+                            <span class="text-gray-500 font-bold mx-1">/</span>
+                            <span class="text-lg font-black text-rose-400 mono">${losses}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Sequência Atual</span>
+                        ${currentWinStreak > 0 ? `<span class="text-sm font-black text-emerald-400 px-2 py-1 bg-emerald-500/10 rounded">${currentWinStreak} Wins</span>` : (currentLossStreak > 0 ? `<span class="text-sm font-black text-rose-400 px-2 py-1 bg-rose-500/10 rounded">${currentLossStreak} Losses</span>` : `<span class="text-sm font-black text-gray-500 px-2 py-1 bg-gray-800 rounded">Neutro</span>`)}
+                    </div>
+                    <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Máximos Históricos</span>
+                        <div class="flex items-center justify-around text-xs font-black">
+                            <span class="text-emerald-400" title="Máx Wins Seguidos">↑ ${maxWinStreak}W</span>
+                            <span class="text-rose-400" title="Máx Losses Seguidos">↓ ${maxLossStreak}L</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-deriv-dark p-3 rounded-xl border border-deriv-border space-y-2">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold block">Distribuição das Vitórias (Até G${botMaxGale})</span>
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-emerald-400">Direto</span><span class="font-black text-white">${directWins}</span></div>
+                        <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-blue-400">Gale 1</span><span class="font-black text-white">${g1Wins}</span></div>
+                        <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-amber-400">Gale 2</span><span class="font-black text-white">${g2Wins}</span></div>
+                        <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-purple-400">G3+</span><span class="font-black text-white">${g3PlusWins}</span></div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeStratStats() {
+            const modal = document.getElementById('stratStatsModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         function startRoundCountdownTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -978,7 +1100,6 @@
             }
         }
 
-        // WS CONNECTION PUBLIC TICK
         function connectDerivWS() {
             const b = document.getElementById('statusBadge'), t = document.getElementById('statusText');
             b.className = 'flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl text-amber-400 text-xs font-semibold'; t.innerText = 'Conectando WS...';
@@ -988,7 +1109,6 @@
                 b.className = 'flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-emerald-400 text-xs font-semibold'; t.innerText = 'Conectado à API';
                 fetchHistoricalTicks();
                 
-                // PING CONSTANTE PARA A API PÚBLICA (Evita Desconexão, Intervalo de 10s)
                 if (wsPingInterval) clearInterval(wsPingInterval);
                 wsPingInterval = setInterval(() => { 
                     if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 })); 
@@ -1008,15 +1128,13 @@
             };
         }
 
+        // SOLICITAÇÃO ÚNICA DE 5000 TICKS PARA EVITAR RATE LIMIT
         function fetchHistoricalTicks() {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
             ws.send(JSON.stringify({ forget_all: 'ticks' })); 
             ticksList = [];
-            historyTotalRequested = parseInt(document.getElementById('historyRangeSelect').value) || 3600;
-            historyFetchedCount = 0;
-            const countRequest = Math.min(historyTotalRequested, 5000);
-            showToast('Baixando dados da API...', 'info');
-            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: countRequest, subscribe: 1 }));
+            showToast('Baixando histórico máximo da API (5000)...', 'info');
+            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: 5000, subscribe: 1 }));
         }
 
         function handleHistoricalDataResponse(history) {
@@ -1032,22 +1150,13 @@
                 }
             }
             
-            if (historyFetchedCount === 0) ticksList = parsedTicks;
-            else ticksList = ticksList.concat(parsedTicks);
-            historyFetchedCount += times.length; 
-            
+            ticksList = parsedTicks;
             document.getElementById('historicalCountTag').innerText = `${ticksList.length} Ticks API`;
 
-            if (historyFetchedCount < historyTotalRequested && times.length > 1) {
-                const remaining = historyTotalRequested - historyFetchedCount;
-                const nextCount = Math.min(remaining, 5000);
-                ws.send(JSON.stringify({ ticks_history: currentSymbol, end: times[0] - 1, style: 'ticks', count: nextCount }));
-            } else {
-                if (ticksList.length > 0) updateLiveTickDisplay(ticksList[0]);
-                calculateStatistics(); runStrategyCataloger(); 
-                if(ticksList.length > 0) renderMinuteGrid(); 
-                showToast(`Sincronização Concluída!`, 'success');
-            }
+            if (ticksList.length > 0) updateLiveTickDisplay(ticksList[0]);
+            calculateStatistics(); runStrategyCataloger(); 
+            if(ticksList.length > 0) renderMinuteGrid(); 
+            showToast(`Sincronização Máxima Concluída!`, 'success');
         }
 
         function handleNewTick(tick) {
@@ -1145,7 +1254,6 @@
             grid.innerHTML = html;
         }
 
-        // CONTROLES DE ENTRADA MANUAL E REAL
         function setQuickStake(amount) { currentStake = amount; document.getElementById('quickInputStake').value = amount.toFixed(2); playTone(800, 0.04); }
         function multiplyStake(factor) { currentStake = Math.max(0.35, currentStake * factor); document.getElementById('quickInputStake').value = currentStake.toFixed(2); playTone(850, 0.04); }
         
@@ -1169,7 +1277,6 @@
             playTone(betType === 'EVEN' ? 750 : 850, 0.1, 'square'); showToast(`Ordem enviada para a API.`, 'success');
         }
 
-        // VALIDADOR LOGIC
         function runStrategyCataloger() {
             matchedPatternIndexes.clear();
             if (ticksList.length === 0 || builderTokens.length === 0) { resetValidatorUI(); updateDigitMatrix(); return; }
@@ -1311,7 +1418,6 @@
             });
         }
 
-        // BOT LOGIC
         function toggleAutoBotUI() {
             isBotRunning = document.getElementById('enableAutoBot').checked;
             const badge = document.getElementById('botStatusBadge');
@@ -1380,7 +1486,6 @@
                 }
 
                 if (checkStrategyPatternMatch(strat)) {
-                    // VERIFICAÇÃO DO FILTRO ANTI-HIT
                     if (antiHitEnabled) {
                         let hitCount = 0;
                         for(let h = 0; h < ticksList.length; h++) {
@@ -1392,18 +1497,16 @@
                         }
                         if (hitCount >= antiHitTarget) {
                             showToast(`Filtro Anti-Hit bloqueou entrada em ${strat.targetBet} (${hitCount}x oposto)`, 'info');
-                            continue; // Ignora e não entra
+                            continue; 
                         }
                     }
 
-                    // AVALIAÇÃO DE LOSS VIRTUAL
                     if (document.getElementById('botVirtualLossEnabled').checked && isBotInVirtualMode) {
                         activeVirtualTrade = { stratId: strat.id, stratName: strat.name, targetBet: strat.targetBet, virtualGaleLevel: 0, maxGale: getMaxGales() };
                         showToast(`[TESTE VIRTUAL] Verificando Padrão...`, 'info'); playTone(450, 0.08, 'sine'); return;
                     }
 
-                    // EXECUÇÃO REAL
-                    if (document.getElementById('botVirtualLossEnabled').checked && !isBotInVirtualMode && botRealTradesLeft <= 0) return; // Segurança
+                    if (document.getElementById('botVirtualLossEnabled').checked && !isBotInVirtualMode && botRealTradesLeft <= 0) return; 
                     
                     if (botCurrentStake > accountRealBalance) { document.getElementById('enableAutoBot').checked = false; toggleAutoBotUI(); showToast('Saldo insuficiente para enviar operação API!', 'error'); return; }
                     
@@ -1425,7 +1528,7 @@
             const isWin = (tBet === 'EVEN' && tick.isEven) || (tBet === 'ODD' && !tick.isEven);
 
             if (isWin) {
-                botVirtualLossCount = 0; // Se ganhou, reseta contagem do loss virtual
+                botVirtualLossCount = 0;
                 logTradeToTable({ time: tick.time, source: `Simulado (WIN)`, type: tBet, digit: tick.digit, resultText: `VIRT. WIN`, isWin: true, isVirtual: true });
                 
                 botLastTradeEndEpoch.set(activeVirtualTrade.stratId, tick.epoch);
@@ -1446,7 +1549,7 @@
                     if (botVirtualLossCount >= vTarget) {
                         isBotInVirtualMode = false;
                         botRealTradesLeft = parseInt(document.getElementById('botRealEntriesTarget').value) || 1;
-                        botVirtualLossCount = 0; // reseta para o próximo ciclo
+                        botVirtualLossCount = 0; 
                         showToast(`Loss Virtual Atingido! Iniciando ${botRealTradesLeft} entradas reais.`);
                     }
                     
@@ -1502,7 +1605,7 @@
             if (document.getElementById('botVirtualLossEnabled').checked && !isBotInVirtualMode) {
                 botRealTradesLeft--;
                 if (botRealTradesLeft <= 0) {
-                    isBotInVirtualMode = true; // Volta para buscar outro loss virtual
+                    isBotInVirtualMode = true; 
                 }
                 updateVirtualLossBadge();
             }
