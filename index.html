@@ -51,6 +51,17 @@
         }
         
         #stratStatsModal { transition: opacity 0.3s; }
+
+        /* Tooltip CSS para Anti-Surf */
+        .tooltip-group { position: relative; display: inline-flex; align-items: center; }
+        .tooltip-text { 
+            visibility: hidden; width: 260px; background-color: #1a1f2c; color: #cbd5e1; 
+            text-align: left; border-radius: 8px; padding: 12px; position: absolute; 
+            z-index: 100; bottom: 135%; left: 50%; transform: translateX(-50%); 
+            opacity: 0; transition: opacity 0.3s; font-size: 10px; border: 1px solid #283044; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8); font-weight: normal; text-transform: none; line-height: 1.5; 
+        }
+        .tooltip-group:hover .tooltip-text { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-red-500 selection:text-white relative">
@@ -171,7 +182,6 @@
             </div>
 
             <div class="flex items-center flex-wrap gap-3">
-                <!-- Dropdown de "Histórico API" removido, pois o sistema sempre puxa os 5000 máximos agora. -->
                 
                 <div class="flex items-center space-x-1.5 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
                     <i class="fa-solid fa-chart-pie text-emerald-400 text-xs"></i>
@@ -341,9 +351,13 @@
 
                         <div class="pt-2 border-t border-deriv-border/80 space-y-2 text-[10px]">
                             <div class="bg-deriv-dark/90 p-2 rounded-lg border border-deriv-border">
-                                <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer">
+                                <label class="flex items-center gap-2 font-bold text-gray-200 cursor-pointer tooltip-group">
                                     <input type="checkbox" id="botAntiSurfEnabled" checked class="w-3 h-3 rounded text-blue-500 focus:ring-0">
                                     <span class="text-blue-300">Ativar Anti-Surf (Trancar estratégia até quebrar a zona)</span>
+                                    <i class="fa-solid fa-circle-question text-gray-500 cursor-help ml-1"></i>
+                                    <span class="tooltip-text">
+                                        <strong>Filtro Anti-Surf:</strong><br><br>Evita operar em tendências repetitivas (Surfs).<br>Se a última pedra do seu padrão continuar saindo em sequência, o robô bloqueia as entradas e só libera após vir uma pedra diferente (quebra de surf).
+                                    </span>
                                 </label>
                             </div>
 
@@ -417,13 +431,9 @@
                         <i class="fa-solid fa-fire text-amber-400 text-sm"></i>
                         <span class="text-xs text-gray-300">Sequência Atual: <strong id="streakCountText" class="text-white">Aguardando...</strong></span>
                     </div>
-                    <div class="flex items-center justify-between text-[10px] text-gray-400 px-1 mb-1">
-                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded border-2 border-amber-400 bg-amber-500/30"></span> Dourado</span>
-                        <span class="flex items-center gap-1"><span class="text-emerald-400 font-bold">[W]</span> Vitória</span>
-                        <span class="flex items-center gap-1"><span class="text-rose-400 font-bold">[L]</span> Derrota</span>
-                    </div>
+                    
                     <div class="text-[9px] text-gray-500 text-center pb-1">
-                        Desenhando os máx 2000 blocos visuais.
+                        Desenhando os máx 500 blocos visuais.
                     </div>
                     <div class="pt-2 border-t border-deriv-border/60 flex-grow">
                         <div id="digitMatrixGrid" class="flex flex-wrap gap-2 max-h-56 lg:max-h-80 overflow-y-auto p-1">
@@ -498,7 +508,13 @@
                             </select>
                         </div>
                         <div class="lg:col-span-3 space-y-1">
-                            <label class="text-[11px] font-bold text-gray-300 uppercase text-blue-400">Filtro Anti-Surf</label>
+                            <label class="text-[11px] font-bold text-gray-300 uppercase text-blue-400 tooltip-group flex items-center gap-1">
+                                Filtro Anti-Surf <i class="fa-solid fa-circle-question text-gray-500 cursor-help"></i>
+                                <span class="tooltip-text">
+                                    <strong class="text-blue-400 block mb-1">Aguardar Quebra:</strong> Tranca a contagem se a última pedra continuar se repetindo. Só computa a entrada quando a sequência "quebrar".<br><br>
+                                    <strong class="text-blue-400 block mb-1">Apenas Pular Ticks:</strong> O padrão entra em qualquer condição exata, ignorando se existe uma longa sequência (surf).
+                                </span>
+                            </label>
                             <select id="catAntiSurfSelect" onchange="runStrategyCataloger()" class="w-full bg-deriv-dark border border-deriv-border rounded-xl px-2.5 py-2 text-white font-extrabold text-xs focus:outline-none focus:border-blue-400 cursor-pointer">
                                 <option value="ON" selected>Aguardar Quebra</option>
                                 <option value="OFF">Apenas Pular Ticks</option>
@@ -552,7 +568,10 @@
                 <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-table-columns text-blue-400"></i> Grade Histórica por Minuto (0 a 9)
                 </span>
-                <span class="text-[10px] text-gray-400 hidden md:block">Preenche a linha atual e move tudo para baixo a cada fechamento de bloco.</span>
+                <span class="text-[10px] text-gray-400 hidden md:block flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-emerald-500 text-black font-black">W/G</span> Vitória do Padrão
+                    <span class="px-2 py-0.5 rounded bg-rose-500 text-white font-black ml-2">L</span> Derrota do Padrão
+                </span>
             </div>
             
             <div class="overflow-x-auto w-full pb-2">
@@ -595,8 +614,11 @@
         let lastBeepSecond = -1;
         let isBettingLocked = false; 
 
-        let builderTokens = ['EVEN', 'EVEN', 'EVEN'];
+        // O Padrão Inicia Vazio
+        let builderTokens = [];
+        // Mapeamento agora usará o epoch do tick como chave para localizar a pedra exata do Resultado
         let matchedPatternIndexes = new Map();
+        
         let savedRobotStrategies = []; 
 
         // SESSION DATA
@@ -1128,13 +1150,17 @@
             };
         }
 
-        // SOLICITAÇÃO ÚNICA DE 5000 TICKS PARA EVITAR RATE LIMIT
+        // SOLICITAÇÃO SEPARADA PARA EVITAR CONGESTIONAMENTO DE API
         function fetchHistoricalTicks() {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
             ws.send(JSON.stringify({ forget_all: 'ticks' })); 
             ticksList = [];
-            showToast('Baixando histórico máximo da API (5000)...', 'info');
-            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: 5000, subscribe: 1 }));
+            showToast('Baixando histórico (5000) e conectando ao vivo...', 'info');
+            
+            // Pede apenas o histórico em um pacote...
+            ws.send(JSON.stringify({ ticks_history: currentSymbol, end: 'latest', style: 'ticks', count: 5000 }));
+            // ... e assina o streaming ao vivo no outro.
+            ws.send(JSON.stringify({ ticks: currentSymbol, subscribe: 1 }));
         }
 
         function handleHistoricalDataResponse(history) {
@@ -1237,8 +1263,24 @@
                     [0, 20, 40].forEach(sec => {
                         const t = blockData[sec];
                         if (t) {
-                            const bg = t.isEven ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40' : 'bg-purple-500/10 text-purple-400 border-purple-500/40';
-                            html += `<div class="w-[26px] h-[26px] rounded flex items-center justify-center font-black text-[11px] border shadow-sm ${bg}">${t.digit}</div>`;
+                            // VERIFICA SE ESTA PEDRA FOI A PEDRA DE RESULTADO E ILUMINA
+                            const matchData = matchedPatternIndexes.get(t.epoch);
+                            let bg = t.isEven ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40' : 'bg-purple-500/10 text-purple-400 border-purple-500/40';
+                            let borderClass = 'border shadow-sm';
+                            let tagHTML = '';
+                            
+                            if (matchData) {
+                                borderClass = 'border-2 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] scale-110 z-10 relative';
+                                if (matchData.result === 'W') {
+                                    bg = 'bg-emerald-600/40 text-emerald-300';
+                                    tagHTML = `<span class="absolute -top-1.5 -right-1.5 px-0.5 py-0 rounded text-[7px] font-black ${matchData.result === 'W' ? 'bg-emerald-500 text-black' : 'bg-rose-500 text-white'} shadow-md">${matchData.gale === 0 ? 'W' : 'G'+matchData.gale}</span>`;
+                                } else {
+                                    bg = 'bg-rose-600/40 text-rose-300';
+                                    tagHTML = `<span class="absolute -top-1.5 -right-1.5 px-0.5 py-0 rounded text-[7px] font-black bg-rose-500 text-white shadow-md">L</span>`;
+                                }
+                            }
+
+                            html += `<div class="relative w-[26px] h-[26px] rounded flex items-center justify-center font-black text-[11px] ${borderClass} ${bg}">${t.digit}${tagHTML}</div>`;
                         } else {
                             html += `<div class="w-[26px] h-[26px] rounded bg-deriv-panel border border-deriv-border flex items-center justify-center text-gray-600/30 text-[10px] shadow-sm"></div>`;
                         }
@@ -1313,8 +1355,12 @@
                         }
                     }
 
-                    const startNewestIdx = totalTicks - 1 - i, endNewestIdx = totalTicks - 1 - (i + patternLen - 1);
-                    for (let k = endNewestIdx; k <= startNewestIdx; k++) matchedPatternIndexes.set(k, { isStart: k === startNewestIdx, isEnd: k === endNewestIdx, result: signalWon ? 'W' : 'L', gale: galeUsed });
+                    // AQUI FICA A LÓGICA NOVA DE DESTAQUE: REGISTRA APENAS A PEDRA DO RESULTADO
+                    let resultIdx = signalWon ? (entryIdx + galeUsed) : Math.min(entryIdx + maxGale, totalTicks - 1);
+                    let resultTick = sampleTicks[resultIdx];
+                    if (resultTick) {
+                        matchedPatternIndexes.set(resultTick.epoch, { result: signalWon ? 'W' : 'L', gale: galeUsed });
+                    }
 
                     if (signalWon) {
                         if (galeUsed === 0) directWins++; else if (galeUsed === 1) g1Wins++; else if (galeUsed === 2) g2Wins++; else if (galeUsed === 3) g3Wins++;
@@ -1397,23 +1443,19 @@
             }
         }
 
+        // DESTAQUES FORAM REMOVIDOS DESTA GRADE CONFORME SOLICITADO
         function updateDigitMatrix() {
             const matrixGrid = document.getElementById('digitMatrixGrid'); if (ticksList.length === 0) return;
-            const limit = Math.min(globalSampleSize, 2000); 
+            const limit = Math.min(globalSampleSize, 500); 
             const recent = ticksList.slice(0, limit); 
             matrixGrid.innerHTML = '';
             
-            recent.forEach((t, idx) => {
-                const isEven = t.isEven, matchData = matchedPatternIndexes.get(idx);
-                let border = matchData ? 'border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105 z-10' : (isEven ? 'border border-deriv-even' : 'border border-deriv-odd');
+            recent.forEach((t) => {
+                const isEven = t.isEven;
+                let border = isEven ? 'border border-deriv-even' : 'border border-deriv-odd';
                 const badge = document.createElement('div');
                 badge.className = `relative flex flex-col items-center justify-center p-1 rounded-xl font-bold text-xs mono ${isEven ? 'bg-deriv-even/20 text-emerald-400' : 'bg-deriv-odd/20 text-purple-400'} ${border} transition-transform hover:scale-110 cursor-pointer min-w-[52px] min-h-[52px]`;
-                let tag = '';
-                if (matchData && matchData.isEnd) {
-                    if (matchData.result === 'W') tag = `<span class="absolute -top-2 -right-2 px-1 py-0.2 rounded-full bg-emerald-500 text-black text-[8px] font-extrabold shadow-md">${matchData.gale === 0 ? 'W Direto' : 'W G'+matchData.gale}</span>`;
-                    else tag = `<span class="absolute -top-2 -right-2 px-1 py-0.2 rounded-full bg-rose-500 text-white text-[8px] font-extrabold shadow-md">L (Hit)</span>`;
-                }
-                badge.innerHTML = `<span class="text-sm font-black">${t.digit}</span><span class="text-[8px] font-normal text-gray-300/80 leading-none mt-0.5">${t.time}</span>${tag}`;
+                badge.innerHTML = `<span class="text-sm font-black">${t.digit}</span><span class="text-[8px] font-normal text-gray-300/80 leading-none mt-0.5">${t.time}</span>`;
                 matrixGrid.appendChild(badge);
             });
         }
