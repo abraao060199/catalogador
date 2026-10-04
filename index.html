@@ -74,9 +74,7 @@
                 <h3 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-chart-pie text-amber-400"></i> Raio-X da Estratégia</h3>
                 <button onclick="closeStratStats()" class="text-gray-400 hover:text-rose-400 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="stratStatsContent" class="space-y-4">
-                <!-- Conteúdo gerado dinamicamente via JS -->
-            </div>
+            <div id="stratStatsContent" class="space-y-4"></div>
         </div>
     </div>
 
@@ -89,16 +87,6 @@
         </div>
         
         <div class="p-4 space-y-6">
-            <div class="bg-deriv-dark border border-deriv-border rounded-xl p-3 shadow-inner">
-                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block"><i class="fa-solid fa-chart-line text-blue-400"></i> Dados da Sessão</span>
-                <div class="grid grid-cols-2 gap-2 text-center text-xs">
-                    <div class="bg-deriv-card p-2 rounded-lg border border-deriv-border"><span class="block text-[10px] text-gray-500">Wins Seguidos (Atual)</span><strong id="sessionCurWins" class="text-emerald-400 mono text-sm">0</strong></div>
-                    <div class="bg-deriv-card p-2 rounded-lg border border-deriv-border"><span class="block text-[10px] text-gray-500">Derrotas Seguidas (Atual)</span><strong id="sessionCurLosses" class="text-rose-400 mono text-sm">0</strong></div>
-                    <div class="bg-deriv-card p-2 rounded-lg border border-deriv-border"><span class="block text-[10px] text-gray-500">Maior Seq. Derrotas</span><strong id="sessionMaxLosses" class="text-amber-400 mono text-sm">0</strong></div>
-                    <div class="bg-deriv-card p-2 rounded-lg border border-deriv-border"><span class="block text-[10px] text-gray-500">Maior Stake Usada</span><strong id="sessionMaxStake" class="text-white mono text-sm">$0.00</strong></div>
-                </div>
-            </div>
-
             <div>
                 <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-3">
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-deriv-accent"></i> Proporção Par vs Ímpar</span>
@@ -154,7 +142,6 @@
 
     <header class="bg-deriv-card border-b border-deriv-border px-4 py-3 sticky top-0 z-40 shadow-2xl backdrop-blur-md bg-opacity-95">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-            
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center font-black text-white text-2xl shadow-lg glow-brand transform hover:scale-105 transition">
                     <i class="fa-solid fa-chart-pie"></i>
@@ -171,8 +158,6 @@
             </div>
 
             <div class="flex items-center flex-wrap gap-3">
-                <!-- Dropdown de "Histórico API" removido, pois o sistema sempre puxa os 5000 máximos agora. -->
-                
                 <div class="flex items-center space-x-1.5 bg-deriv-dark px-3 py-2 rounded-xl border border-deriv-border shadow-inner">
                     <i class="fa-solid fa-chart-pie text-emerald-400 text-xs"></i>
                     <label for="globalSampleSelect" class="text-xs text-gray-400 font-semibold">Analisar Ticks:</label>
@@ -210,10 +195,8 @@
 
     <main class="max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6 flex-grow">
 
-        <!-- ROW 1: CONTROLES E ÚLTIMOS RESULTADOS COM ITEMS-START PARA NÃO ESTICAREM MÚTUAMENTE -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-            <!-- LADO ESQUERDO: CONTROLES, TEMPORIZADOR, ABAS (MANUAL / ROBÔ) -->
+            <!-- LADO ESQUERDO: CONTROLES, TEMPORIZADOR, ABAS -->
             <div class="lg:col-span-8 bg-gradient-to-r from-deriv-card via-deriv-panel to-deriv-card border-2 border-deriv-border rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all flex flex-col space-y-5">
                 
                 <div class="bg-deriv-dark/90 p-4 rounded-2xl border border-deriv-border/80 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 shadow-inner">
@@ -247,9 +230,10 @@
                         <button onclick="logoutDeriv()" class="text-xs text-rose-400 hover:text-rose-300 font-bold ml-2"><i class="fa-solid fa-power-off"></i> Sair</button>
                     </div>
                     
-                    <div class="flex bg-deriv-dark p-1 rounded-xl border border-deriv-border w-full sm:w-64">
+                    <div class="flex bg-deriv-dark p-1 rounded-xl border border-deriv-border w-full sm:w-[320px]">
                         <button id="tabManualBtn" onclick="switchTab('MANUAL')" class="flex-1 py-1.5 rounded-lg bg-deriv-card border border-amber-400 text-amber-400 text-sm font-bold transition shadow-sm">MANUAL</button>
                         <button id="tabRoboBtn" onclick="switchTab('ROBO')" class="flex-1 py-1.5 rounded-lg bg-transparent border border-transparent text-gray-400 hover:text-white text-sm font-bold transition">ROBÔ</button>
+                        <button id="tabListaBtn" onclick="switchTab('LISTA')" class="flex-1 py-1.5 rounded-lg bg-transparent border border-transparent text-gray-400 hover:text-white text-sm font-bold transition">LISTA</button>
                     </div>
                 </div>
 
@@ -277,7 +261,6 @@
                         </div>
                     </div>
 
-                    <!-- Botões sem altura forçada para não esticarem -->
                     <div class="md:col-span-7 grid grid-cols-2 gap-3">
                         <button onclick="placeFastBet('EVEN')" id="btnFastEven" class="group relative py-6 px-4 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 border-2 border-emerald-500/60 hover:border-emerald-400 hover:bg-emerald-500/30 text-emerald-300 font-black transition-all active:scale-95 flex flex-col items-center justify-center shadow-lg glow-even">
                             <span id="labelFastEvenIcon" class="text-xs uppercase tracking-widest text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Entrar Manual</span>
@@ -378,9 +361,56 @@
                             </div>
                         </div>
                     </div>
-                    <button onclick="resetSimulator()" class="w-full py-1.5 text-[10px] text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5 mt-2">
-                        <i class="fa-solid fa-rotate-right"></i> Resetar Filtros
-                    </button>
+                </div>
+
+                <!-- CONTEÚDO DA ABA: LISTA DE SINAIS -->
+                <div id="listaInterface" class="hidden flex-grow space-y-4">
+                    <div class="flex items-center justify-between border-b border-deriv-border pb-2 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-list-ol text-blue-400 text-base"></i>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Executor de Sinais Agendados</h3>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 bg-deriv-dark px-3 py-1 rounded-lg border border-deriv-border shadow-inner">
+                            <span class="text-[10px] font-bold text-gray-400">Placar Lista:</span>
+                            <span class="text-xs font-black text-emerald-400 mono" id="listPlacarWins">0W</span>
+                            <span class="text-xs font-black text-gray-500">x</span>
+                            <span class="text-xs font-black text-rose-400 mono" id="listPlacarLosses">0L</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Coluna de Configuração de Lista -->
+                        <div class="space-y-3 text-xs bg-deriv-panel/60 p-3 rounded-xl border border-deriv-border">
+                            <div class="flex items-center justify-between bg-deriv-dark p-2 rounded-xl border border-deriv-border">
+                                <label class="font-black text-[11px] text-white flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="enableListBot" onchange="toggleListBotUI()" class="w-4 h-4 rounded bg-deriv-card border-deriv-border text-blue-500 focus:ring-0 cursor-pointer">
+                                    <span>LIGAR LISTA DE SINAIS</span>
+                                </label>
+                                <span id="listStatusBadge" class="text-[9px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase">DESLIGADO</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Stake Inic ($):</label><input type="number" id="listInitialStake" value="1.00" min="0.35" step="0.5" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white mono font-extrabold focus:outline-none"></div>
+                                <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Fator Gale:</label><input type="number" id="listGaleFactor" value="2.0" min="1.0" step="0.1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-amber-300 mono font-extrabold focus:outline-none"></div>
+                                <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Máx. Gales:</label>
+                                    <select id="listMaxGaleCount" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-white font-extrabold focus:outline-none cursor-pointer">
+                                        <option value="0">0</option><option value="1">1 (G1)</option><option value="2" selected>2 (G2)</option><option value="3">3 (G3)</option><option value="4">4 (G4)</option>
+                                    </select>
+                                </div>
+                                <div><label class="block text-gray-300 font-bold mb-1 text-[10px]">Stop Loss ($):</label><input type="number" id="listStopLoss" value="50" min="1" class="w-full bg-deriv-dark border border-deriv-border rounded-lg px-2 py-1.5 text-rose-400 mono font-extrabold focus:outline-none"></div>
+                            </div>
+                        </div>
+
+                        <!-- Coluna Textarea Sinais -->
+                        <div class="flex flex-col h-full space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="text-[10px] font-bold text-gray-300 uppercase">Cole seus Sinais (Hora:Min:Seg TIPO)</label>
+                                <span id="listSignalsParsedCount" class="text-[10px] text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">0 Lidos</span>
+                            </div>
+                            <textarea id="signalListText" oninput="parseSignalList()" class="flex-grow w-full bg-deriv-dark border border-deriv-border rounded-xl p-3 text-white mono text-xs focus:outline-none focus:border-blue-500 resize-none" placeholder="Ex:\n10:30:00 EVEN\n10:30:40 ODD\n11:00:20 PAR"></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="lockoutWarningBanner" class="hidden mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
@@ -417,14 +447,7 @@
                         <i class="fa-solid fa-fire text-amber-400 text-sm"></i>
                         <span class="text-xs text-gray-300">Sequência Atual: <strong id="streakCountText" class="text-white">Aguardando...</strong></span>
                     </div>
-                    <div class="flex items-center justify-between text-[10px] text-gray-400 px-1 mb-1">
-                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded border-2 border-amber-400 bg-amber-500/30"></span> Dourado</span>
-                        <span class="flex items-center gap-1"><span class="text-emerald-400 font-bold">[W]</span> Vitória</span>
-                        <span class="flex items-center gap-1"><span class="text-rose-400 font-bold">[L]</span> Derrota</span>
-                    </div>
-                    <div class="text-[9px] text-gray-500 text-center pb-1">
-                        Desenhando os máx 2000 blocos visuais.
-                    </div>
+
                     <div class="pt-2 border-t border-deriv-border/60 flex-grow">
                         <div id="digitMatrixGrid" class="flex flex-wrap gap-2 max-h-56 lg:max-h-80 overflow-y-auto p-1">
                             <p class="text-gray-500 text-xs italic">A carregar dados históricos da Deriv...</p>
@@ -552,7 +575,7 @@
                 <span class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-table-columns text-blue-400"></i> Grade Histórica por Minuto (0 a 9)
                 </span>
-                <span class="text-[10px] text-gray-400 hidden md:block">Preenche a linha atual e move tudo para baixo a cada fechamento de bloco.</span>
+                <span class="text-[10px] text-gray-400 hidden md:block">Preenche a linha atual e move tudo para baixo a cada fechamento de bloco. Padrões analisados são destacados.</span>
             </div>
             
             <div class="overflow-x-auto w-full pb-2">
@@ -573,7 +596,7 @@
         let isSoundEnabled = true;
         const ALLOWED_SECONDS = [0, 20, 40];
 
-        // PING INTERVALS PARA EVITAR DESCONEXÃO DA DERIV
+        // PING INTERVALS PARA EVITAR DESCONEXÃO
         let wsPingInterval = null;
         let wsTradePingInterval = null;
 
@@ -595,11 +618,12 @@
         let lastBeepSecond = -1;
         let isBettingLocked = false; 
 
-        let builderTokens = ['EVEN', 'EVEN', 'EVEN'];
+        // VALIDADOR LIMPADO DE FÁBRICA
+        let builderTokens = [];
         let matchedPatternIndexes = new Map();
         let savedRobotStrategies = []; 
 
-        // SESSION DATA
+        // SESSION DATA GERAL
         let totalWins = 0, totalLosses = 0;
         let sessionCurWins = 0, sessionCurLosses = 0, sessionMaxLosses = 0, sessionMaxStake = 0;
         let pendingBet = null; 
@@ -609,14 +633,20 @@
         let isBotRunning = false;
         let botCurrentGaleLevel = 0;
         let botCurrentStake = 1.00;
-
         let botVirtualLossCount = 0;
         let isBotInVirtualMode = false;
         let botRealTradesLeft = 0;
         let activeVirtualTrade = null;         
-
         let botLastTradeEndEpoch = new Map();
         let botSurfLocked = new Map();
+
+        // LISTA DE SINAIS STATE
+        let isListRunning = false;
+        let parsedSignalList = [];
+        let listCurrentGaleLevel = 0;
+        let listCurrentStake = 1.00;
+        let listTotalWins = 0, listTotalLosses = 0;
+        
         let audioCtx = null;
 
         // OAUTH API LOGIN
@@ -670,6 +700,8 @@
                         sessionStorage.removeItem('pkce_code_verifier');
                         sessionStorage.removeItem('oauth_state');
                         window.history.replaceState({}, document.title, redirectUri);
+                        
+                        localStorage.setItem('deriv_token_pro', data.access_token);
                         derivAccessToken = data.access_token;
                         document.getElementById('login-overlay').style.display = 'none';
                         fetchAccountsOAuth();
@@ -747,27 +779,41 @@
             if(wsTrade) wsTrade.close();
             if (wsTradePingInterval) clearInterval(wsTradePingInterval);
             derivAccessToken = '';
+            localStorage.removeItem('deriv_token_pro');
             document.getElementById('login-overlay').style.display = 'flex';
         }
 
         function switchTab(tab) {
             const manualUI = document.getElementById('manualInterface');
             const roboUI = document.getElementById('roboInterface');
+            const listaUI = document.getElementById('listaInterface');
             const manualBtn = document.getElementById('tabManualBtn');
             const roboBtn = document.getElementById('tabRoboBtn');
+            const listaBtn = document.getElementById('tabListaBtn');
+
+            manualUI.classList.add('hidden');
+            roboUI.classList.add('hidden');
+            listaUI.classList.add('hidden');
+
+            manualBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm', 'border-blue-400', 'text-blue-400');
+            manualBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
+            roboBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm', 'border-blue-400', 'text-blue-400');
+            roboBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
+            listaBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm', 'border-blue-400', 'text-blue-400');
+            listaBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
 
             if (tab === 'MANUAL') {
-                manualUI.classList.remove('hidden'); roboUI.classList.add('hidden');
+                manualUI.classList.remove('hidden');
                 manualBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
-                manualBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
-                roboBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
-                roboBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
-            } else {
-                manualUI.classList.add('hidden'); roboUI.classList.remove('hidden');
+                manualBtn.classList.remove('text-gray-400');
+            } else if (tab === 'ROBO') {
+                roboUI.classList.remove('hidden');
                 roboBtn.classList.add('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
-                roboBtn.classList.remove('bg-transparent', 'border-transparent', 'text-gray-400');
-                manualBtn.classList.add('bg-transparent', 'border-transparent', 'text-gray-400');
-                manualBtn.classList.remove('bg-deriv-card', 'border-amber-400', 'text-amber-400', 'shadow-sm');
+                roboBtn.classList.remove('text-gray-400');
+            } else if (tab === 'LISTA') {
+                listaUI.classList.remove('hidden');
+                listaBtn.classList.add('bg-deriv-card', 'border-blue-400', 'text-blue-400', 'shadow-sm');
+                listaBtn.classList.remove('text-gray-400');
             }
         }
 
@@ -825,11 +871,6 @@
             calculateStatistics(); runStrategyCataloger(); renderMinuteGrid();
         }
 
-        function getMaxGales() {
-            const val = parseInt(document.getElementById('botMaxGaleCount').value, 10);
-            return isNaN(val) ? 0 : val;
-        }
-
         // SALVAMENTO DE ESTRATÉGIAS
         function loadStrategies() {
             const saved = localStorage.getItem('deriv_bot_strategies_pro');
@@ -838,12 +879,20 @@
             }
             renderBotStrategyList();
         }
-
         function saveStrategies() {
             localStorage.setItem('deriv_bot_strategies_pro', JSON.stringify(savedRobotStrategies));
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            const savedToken = localStorage.getItem('deriv_token_pro');
+            if (savedToken) {
+                derivAccessToken = savedToken;
+                document.getElementById('login-overlay').style.display = 'none';
+                fetchAccountsOAuth();
+            } else {
+                handleOAuthCallback();
+            }
+
             updateGlobalSample();
             initDigitBars(); connectDerivWS(); startRoundCountdownTimer(); renderBuilderTokens(); loadStrategies(); updateFilterUIState();
             
@@ -855,79 +904,9 @@
                 currentStake = parseFloat(e.target.value) || 1.0; 
                 if(accountRealBalance > 0) document.getElementById('deckBalanceText').innerText = `$${accountRealBalance.toFixed(2)}`; 
             });
-            
-            handleOAuthCallback();
         });
 
-        function updateFilterUIState() {
-            const vLossEnabled = document.getElementById('botVirtualLossEnabled').checked;
-            document.getElementById('virtualLossControls').className = vLossEnabled ? 'flex flex-wrap items-center gap-2 pl-5 text-[10px]' : 'flex flex-wrap items-center gap-2 pl-5 text-[10px] opacity-50 pointer-events-none';
-            document.getElementById('vLossStatusBadgeTag').className = vLossEnabled ? 'text-[8px] font-black px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase' : 'hidden';
-            if (vLossEnabled && botRealTradesLeft <= 0) { isBotInVirtualMode = true; }
-            updateVirtualLossBadge();
-        }
-
-        function updateVirtualLossBadge() {
-            const target = parseInt(document.getElementById('botVirtualLossTarget').value) || 1;
-            const badge = document.getElementById('vLossCounterText');
-            if (!badge) return;
-            if (isBotInVirtualMode) { badge.innerHTML = `Analisando: ${botVirtualLossCount}/${target}`; } 
-            else if (botRealTradesLeft > 0) { badge.innerHTML = `Entrando Real. Restam: ${botRealTradesLeft}`; }
-            else { badge.innerHTML = `Inativo`; }
-        }
-
-        function renderBuilderTokens() {
-            const container = document.getElementById('patternTokensDisplay'); if (!container) return;
-            if (builderTokens.length === 0) { container.innerHTML = `<span class="text-xs text-gray-500 italic">Nenhuma pedra adicionada...</span>`; runStrategyCataloger(); return; }
-            container.innerHTML = '';
-            builderTokens.forEach((token, index) => {
-                const chip = document.createElement('div');
-                let bgStyle = '', label = '';
-                if (token === 'EVEN') { bgStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'; label = 'PAR'; }
-                else if (token === 'ODD') { bgStyle = 'bg-purple-500/20 text-purple-300 border-purple-500/50'; label = 'ÍMPAR'; }
-                else if (token === 'ANY') { bgStyle = 'bg-blue-500/20 text-blue-300 border-blue-500/50'; label = 'TANTO FAZ'; }
-                else { const isEven = parseInt(token) % 2 === 0; bgStyle = isEven ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-purple-950 text-purple-300 border-purple-500/40'; label = `DÍGITO ${token}`; }
-                chip.className = `px-2.5 py-1 rounded-xl border text-xs font-black mono flex items-center gap-1.5 shadow-sm ${bgStyle}`;
-                chip.innerHTML = `<span>${index + 1}. ${label}</span><button onclick="removeBuilderTokenAt(${index})" class="hover:text-rose-400 text-gray-400 transition ml-0.5" title="Remover pedra"><i class="fa-solid fa-xmark text-[10px]"></i></button>`;
-                container.appendChild(chip);
-            });
-            runStrategyCataloger();
-        }
-
-        function addBuilderToken(token) { if (builderTokens.length >= 10) return; builderTokens.push(token); renderBuilderTokens(); playTone(700, 0.03); }
-        function popBuilderToken() { if (builderTokens.length === 0) return; builderTokens.pop(); renderBuilderTokens(); playTone(500, 0.03); }
-        function removeBuilderTokenAt(idx) { builderTokens.splice(idx, 1); renderBuilderTokens(); playTone(500, 0.03); }
-        function clearBuilderTokens() { builderTokens = []; renderBuilderTokens(); playTone(400, 0.05); }
-
-        function addStrategyToBot() {
-            if (builderTokens.length === 0) return;
-            const targetBet = document.getElementById('catTargetBet').value;
-            const tokensSummary = builderTokens.map(t => t === 'EVEN' ? 'PAR' : t === 'ODD' ? 'ÍMPAR' : t === 'ANY' ? 'TANTO FAZ' : t).join(' -> ');
-            const stratObj = { id: 'STRAT_' + Date.now(), name: `[ ${tokensSummary} ] => ${targetBet === 'EVEN' ? 'PAR' : 'ÍMPAR'}`, tokens: [...builderTokens], targetBet: targetBet, enabled: true };
-            savedRobotStrategies.push(stratObj); 
-            saveStrategies(); renderBotStrategyList();
-            showToast(`Estratégia salva na lista do Robô!`, 'success'); playTone(900, 0.15, 'triangle');
-        }
-
-        function renderBotStrategyList() {
-            const listContainer = document.getElementById('botStrategyList'); if (!listContainer) return;
-            let html = `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]"><label class="flex items-center gap-2 cursor-pointer font-bold text-gray-200 flex-grow pr-2"><input type="checkbox" id="strat_check_validator" checked class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-emerald-500 focus:ring-0 cursor-pointer"><span class="text-amber-300 font-extrabold">[ Padrão Ativo Validador ]</span></label></div>`;
-            savedRobotStrategies.forEach((strat) => {
-                html += `<div class="flex items-center justify-between bg-deriv-card p-1.5 rounded-lg border border-deriv-border text-[10px]">
-                    <label class="flex items-center gap-2 cursor-pointer font-semibold text-gray-200 flex-grow pr-2 truncate"><input type="checkbox" onchange="toggleStrategyEnabled('${strat.id}', this.checked)" ${strat.enabled ? 'checked' : ''} class="w-3 h-3 rounded bg-deriv-dark border-deriv-border text-red-500 focus:ring-0 cursor-pointer"><span class="truncate">${strat.name}</span></label>
-                    <div class="flex items-center gap-1">
-                        <button onclick="showStratStats('${strat.id}')" title="Ver Estatísticas" class="p-1 text-blue-400 hover:text-blue-300 transition active:scale-95"><i class="fa-solid fa-chart-simple text-xs"></i></button>
-                        <button onclick="deleteStrategyFromBot('${strat.id}')" title="Excluir" class="p-1 text-gray-400 hover:text-rose-400 transition active:scale-95"><i class="fa-solid fa-trash-can text-xs"></i></button>
-                    </div>
-                </div>`;
-            });
-            listContainer.innerHTML = html;
-        }
-
-        function toggleStrategyEnabled(stratId, isChecked) { const strat = savedRobotStrategies.find(s => s.id === stratId); if (strat) { strat.enabled = isChecked; saveStrategies(); } }
-        function deleteStrategyFromBot(stratId) { savedRobotStrategies = savedRobotStrategies.filter(s => s.id !== stratId); saveStrategies(); renderBotStrategyList(); }
-
-        // EXIBIR ESTATÍSTICAS DA ESTRATÉGIA NO MODAL
+        // ESTATÍSTICAS DA ESTRATÉGIA NO MODAL
         function showStratStats(stratId) {
             const strat = savedRobotStrategies.find(s => s.id === stratId);
             if (!strat) return;
@@ -958,7 +937,7 @@
                     totalSignals++;
                     let entryIdx = i + patternLen, signalWon = false, galeUsed = -1;
                     
-                    for (let g = 0; g <= 4; g++) { // Analisa até o Gale 4 nas estatísticas
+                    for (let g = 0; g <= 4; g++) { 
                         if (entryIdx + g < totalTicks) {
                             const oTick = sampleTicks[entryIdx + g];
                             if ((strat.targetBet === 'EVEN' && oTick.isEven) || (strat.targetBet === 'ODD' && !oTick.isEven)) { signalWon = true; galeUsed = g; break; }
@@ -966,33 +945,24 @@
                     }
 
                     results.push({ won: signalWon, gale: galeUsed });
-                    i += patternLen + (signalWon ? galeUsed + 1 : 5); // Assumindo máximo de 4 gales (5 tickets no total) para continuar a busca se não der Hit
+                    i += patternLen + (signalWon ? galeUsed + 1 : 5); 
                 } else {
                     i++;
                 }
             }
 
             results.forEach(r => {
-                if (r.won && r.gale <= botMaxGale) { // Conta Win apenas se foi dentro do nível de Gale definido
+                if (r.won && r.gale <= botMaxGale) { 
                     wins++;
-                    currentWinStreak++;
-                    maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
-                    currentLossStreak = 0;
-                    
-                    if (r.gale === 0) directWins++;
-                    else if (r.gale === 1) g1Wins++;
-                    else if (r.gale === 2) g2Wins++;
-                    else g3PlusWins++;
+                    currentWinStreak++; maxWinStreak = Math.max(maxWinStreak, currentWinStreak); currentLossStreak = 0;
+                    if (r.gale === 0) directWins++; else if (r.gale === 1) g1Wins++; else if (r.gale === 2) g2Wins++; else g3PlusWins++;
                 } else {
                     losses++;
-                    currentLossStreak++;
-                    maxLossStreak = Math.max(maxLossStreak, currentLossStreak);
-                    currentWinStreak = 0;
+                    currentLossStreak++; maxLossStreak = Math.max(maxLossStreak, currentLossStreak); currentWinStreak = 0;
                 }
             });
 
             const winRate = totalSignals > 0 ? ((wins / totalSignals) * 100).toFixed(1) : 0;
-            
             const modal = document.getElementById('stratStatsModal');
             const content = document.getElementById('stratStatsContent');
             
@@ -1023,7 +993,7 @@
 
                 <div class="grid grid-cols-2 gap-3 text-center">
                     <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border">
-                        <span class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Sequência Atual</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Seq. Atual</span>
                         ${currentWinStreak > 0 ? `<span class="text-sm font-black text-emerald-400 px-2 py-1 bg-emerald-500/10 rounded">${currentWinStreak} Wins</span>` : (currentLossStreak > 0 ? `<span class="text-sm font-black text-rose-400 px-2 py-1 bg-rose-500/10 rounded">${currentLossStreak} Losses</span>` : `<span class="text-sm font-black text-gray-500 px-2 py-1 bg-gray-800 rounded">Neutro</span>`)}
                     </div>
                     <div class="bg-deriv-dark p-2.5 rounded-xl border border-deriv-border">
@@ -1036,7 +1006,7 @@
                 </div>
 
                 <div class="bg-deriv-dark p-3 rounded-xl border border-deriv-border space-y-2">
-                    <span class="text-[10px] text-gray-400 uppercase font-bold block">Distribuição das Vitórias (Até G${botMaxGale})</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-bold block">Distribuição (Até G${botMaxGale})</span>
                     <div class="grid grid-cols-4 gap-2 text-center text-xs">
                         <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-emerald-400">Direto</span><span class="font-black text-white">${directWins}</span></div>
                         <div class="bg-deriv-card p-1.5 rounded border border-deriv-border"><span class="block text-[9px] text-blue-400">Gale 1</span><span class="font-black text-white">${g1Wins}</span></div>
@@ -1046,16 +1016,53 @@
                 </div>
             `;
             
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
         }
 
         function closeStratStats() {
             const modal = document.getElementById('stratStatsModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
         }
 
+        // FUNÇÕES DA LISTA DE SINAIS
+        function parseSignalList() {
+            const lines = document.getElementById('signalListText').value.split('\n');
+            parsedSignalList = [];
+            lines.forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                    const time = parts[0];
+                    const type = parts[1].toUpperCase() === 'EVEN' || parts[1].toUpperCase() === 'PAR' ? 'EVEN' : 'ODD';
+                    parsedSignalList.push({ time, type, executed: false });
+                }
+            });
+            document.getElementById('listSignalsParsedCount').innerText = `${parsedSignalList.length} Lidos`;
+        }
+
+        function toggleListBotUI() {
+            isListRunning = document.getElementById('enableListBot').checked;
+            const badge = document.getElementById('listStatusBadge');
+            
+            if(!wsTrade || wsTrade.readyState !== WebSocket.OPEN) {
+                document.getElementById('enableListBot').checked = false;
+                return showToast("Conecte a sua conta para ligar a Lista.", "error");
+            }
+            
+            if (isListRunning) {
+                if(parsedSignalList.length === 0) {
+                    document.getElementById('enableListBot').checked = false;
+                    return showToast("A lista de sinais está vazia ou no formato errado.", "error");
+                }
+                badge.innerText = 'LISTA ATIVA'; badge.className = 'text-[9px] font-bold px-2.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 animate-pulse';
+                listCurrentGaleLevel = 0; listCurrentStake = parseFloat(document.getElementById('listInitialStake').value) || 1.0;
+                showToast('Executor de Lista Iniciado!', 'success'); playTone(950, 0.15, 'triangle');
+            } else {
+                badge.innerText = 'DESLIGADO'; badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase';
+                showToast('Lista de sinais pausada', 'info');
+            }
+        }
+
+        // TIMER E AVALIAÇÃO DE LISTA
         function startRoundCountdownTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -1083,6 +1090,35 @@
                 } else {
                     badge.className = 'px-2.5 py-1 rounded-lg text-xs font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5'; badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> JANELA ABERTA`; ring.setAttribute('class', 'text-emerald-400 transition-all duration-300');
                 }
+
+                // VERIFICAÇÃO LISTA DE SINAIS EXACT SECOND
+                if (isListRunning && !pendingBet && !isBettingLocked) {
+                    const hh = String(now.getHours()).padStart(2, '0');
+                    const mm = String(now.getMinutes()).padStart(2, '0');
+                    const ss = String(now.getSeconds()).padStart(2, '0');
+                    const timeStr = `${hh}:${mm}:${ss}`;
+                    
+                    const sig = parsedSignalList.find(s => s.time === timeStr && !s.executed);
+                    if (sig) {
+                        sig.executed = true;
+                        
+                        const sl = parseFloat(document.getElementById('listStopLoss').value) || 50;
+                        if (initialRealBalance - accountRealBalance >= sl) { document.getElementById('enableListBot').checked = false; toggleListBotUI(); showToast(`[STOP LOSS DA LISTA] Atingido.`, 'error'); return; }
+
+                        if (listCurrentStake > accountRealBalance) {
+                            document.getElementById('enableListBot').checked = false; toggleListBotUI();
+                            showToast('Saldo insuficiente para a Lista de Sinais!', 'error');
+                        } else {
+                            sessionMaxStake = Math.max(sessionMaxStake, listCurrentStake); document.getElementById('sessionMaxStake').innerText = `$${sessionMaxStake.toFixed(2)}`;
+                            pendingBet = { type: sig.type, stake: listCurrentStake, isAuto: true, source: `Lista (${sig.time})`, botType: 'LISTA', isGale: false, galeLevel: 0 };
+                            wsTrade.send(JSON.stringify({
+                                buy: 1, price: listCurrentStake, parameters: { amount: listCurrentStake, basis: "stake", contract_type: sig.type === 'EVEN' ? "DIGITEVEN" : "DIGITODD", currency: "USD", duration: 1, duration_unit: "t", symbol: currentSymbol }
+                            }));
+                            showToast(`[LISTA] Sinal das ${sig.time} disparado: ${sig.type}`, 'success'); playTone(880, 0.12, 'square');
+                        }
+                    }
+                }
+
             }, 100);
         }
 
@@ -1128,7 +1164,6 @@
             };
         }
 
-        // SOLICITAÇÃO ÚNICA DE 5000 TICKS PARA EVITAR RATE LIMIT
         function fetchHistoricalTicks() {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
             ws.send(JSON.stringify({ forget_all: 'ticks' })); 
@@ -1237,8 +1272,12 @@
                     [0, 20, 40].forEach(sec => {
                         const t = blockData[sec];
                         if (t) {
-                            const bg = t.isEven ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40' : 'bg-purple-500/10 text-purple-400 border-purple-500/40';
-                            html += `<div class="w-[26px] h-[26px] rounded flex items-center justify-center font-black text-[11px] border shadow-sm ${bg}">${t.digit}</div>`;
+                            const globalIdx = ticksList.indexOf(t);
+                            const hasMatch = matchedPatternIndexes.has(globalIdx);
+                            const hlClass = hasMatch ? 'border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)] scale-110 z-10' : 'border border-deriv-border/50';
+                            
+                            const bg = t.isEven ? `bg-emerald-500/10 text-emerald-400 ${hlClass}` : `bg-purple-500/10 text-purple-400 ${hlClass}`;
+                            html += `<div class="w-[26px] h-[26px] rounded flex items-center justify-center font-black text-[11px] transition-all shadow-sm ${bg}">${t.digit}</div>`;
                         } else {
                             html += `<div class="w-[26px] h-[26px] rounded bg-deriv-panel border border-deriv-border flex items-center justify-center text-gray-600/30 text-[10px] shadow-sm"></div>`;
                         }
@@ -1266,7 +1305,7 @@
             if (stake > accountRealBalance && accountRealBalance > 0) { showToast('Saldo insuficiente!', 'error'); return; }
             
             sessionMaxStake = Math.max(sessionMaxStake, stake); document.getElementById('sessionMaxStake').innerText = `$${sessionMaxStake.toFixed(2)}`;
-            pendingBet = { type: betType, stake: stake, isAuto: false, source: 'Manual', stratId: 'MANUAL' };
+            pendingBet = { type: betType, stake: stake, isAuto: false, source: 'Manual', botType: 'MANUAL', stratId: 'MANUAL' };
             document.getElementById('pendingBetType').innerText = betType === 'EVEN' ? 'PAR' : 'ÍMPAR';
             document.getElementById('pendingBetAmount').innerText = `$${stake.toFixed(2)}`; document.getElementById('pendingBetAlert').classList.remove('hidden');
             
@@ -1411,49 +1450,11 @@
                 let tag = '';
                 if (matchData && matchData.isEnd) {
                     if (matchData.result === 'W') tag = `<span class="absolute -top-2 -right-2 px-1 py-0.2 rounded-full bg-emerald-500 text-black text-[8px] font-extrabold shadow-md">${matchData.gale === 0 ? 'W Direto' : 'W G'+matchData.gale}</span>`;
-                    else tag = `<span class="absolute -top-2 -right-2 px-1 py-0.2 rounded-full bg-rose-500 text-white text-[8px] font-extrabold shadow-md">L (Hit)</span>`;
+                    else tag = `<span class="absolute -top-2 -right-2 px-1 py-0.2 rounded-full bg-rose-500 text-white text-[8px] font-extrabold shadow-md">L</span>`;
                 }
                 badge.innerHTML = `<span class="text-sm font-black">${t.digit}</span><span class="text-[8px] font-normal text-gray-300/80 leading-none mt-0.5">${t.time}</span>${tag}`;
                 matrixGrid.appendChild(badge);
             });
-        }
-
-        function toggleAutoBotUI() {
-            isBotRunning = document.getElementById('enableAutoBot').checked;
-            const badge = document.getElementById('botStatusBadge');
-            
-            if(!wsTrade || wsTrade.readyState !== WebSocket.OPEN) {
-                document.getElementById('enableAutoBot').checked = false;
-                return showToast("Conecte a sua conta para ativar o robô real.", "error");
-            }
-            
-            if (isBotRunning) {
-                badge.innerText = 'ROBÔ ATIVO'; badge.className = 'text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse';
-                botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
-                
-                const vLossEnabled = document.getElementById('botVirtualLossEnabled').checked;
-                if(vLossEnabled) { isBotInVirtualMode = true; botRealTradesLeft = 0; botVirtualLossCount = 0; updateVirtualLossBadge(); }
-
-                showToast('Robô ativado na conta conectada!', 'success'); playTone(950, 0.15, 'triangle');
-            } else {
-                badge.innerText = 'DESLIGADO'; badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase';
-                showToast('Robô pausado', 'info');
-            }
-        }
-
-        function checkStrategyPatternMatch(strat) {
-            const tokens = strat.tokens; if (!tokens || tokens.length === 0 || ticksList.length < tokens.length) return false;
-            const recent = ticksList.slice(0, tokens.length).reverse();
-            
-            const lastEnd = botLastTradeEndEpoch.get(strat.id) || 0;
-            if (recent[0].epoch <= lastEnd) return false; 
-
-            for (let i = 0; i < tokens.length; i++) {
-                const t = tokens[i], tk = recent[i];
-                if (t === 'EVEN' && !tk.isEven) return false; if (t === 'ODD' && tk.isEven) return false;
-                if (t !== 'ANY' && t !== 'EVEN' && t !== 'ODD' && !isNaN(t) && tk.digit !== parseInt(t)) return false;
-            }
-            return true;
         }
 
         function evaluateBotStrategy(latestTick) {
@@ -1511,7 +1512,7 @@
                     if (botCurrentStake > accountRealBalance) { document.getElementById('enableAutoBot').checked = false; toggleAutoBotUI(); showToast('Saldo insuficiente para enviar operação API!', 'error'); return; }
                     
                     sessionMaxStake = Math.max(sessionMaxStake, botCurrentStake); document.getElementById('sessionMaxStake').innerText = `$${sessionMaxStake.toFixed(2)}`;
-                    pendingBet = { type: strat.targetBet, stake: botCurrentStake, isAuto: true, source: `Robô (${strat.name})`, stratId: strat.id, isGale: botCurrentGaleLevel > 0, galeLevel: botCurrentGaleLevel };
+                    pendingBet = { type: strat.targetBet, stake: botCurrentStake, isAuto: true, source: `Robô (${strat.name})`, botType: 'ROBO', stratId: strat.id, isGale: botCurrentGaleLevel > 0, galeLevel: botCurrentGaleLevel };
                     
                     wsTrade.send(JSON.stringify({
                         buy: 1, price: botCurrentStake, parameters: { amount: botCurrentStake, basis: "stake", contract_type: strat.targetBet === 'EVEN' ? "DIGITEVEN" : "DIGITODD", currency: "USD", duration: 1, duration_unit: "t", symbol: currentSymbol }
@@ -1560,44 +1561,78 @@
 
         function processBetOutcome(tick) {
             if (!pendingBet) return;
-            const isWin = (pendingBet.type === 'EVEN' && tick.isEven) || (pendingBet.type === 'ODD' && !tick.isEven), stake = pendingBet.stake, stratId = pendingBet.stratId || 'GENERAL';
+            const bType = pendingBet.botType; // MANUAL, ROBO, or LISTA
+            const isWin = (pendingBet.type === 'EVEN' && tick.isEven) || (pendingBet.type === 'ODD' && !tick.isEven);
+            const stake = pendingBet.stake;
 
             if (isWin) {
                 const profit = stake * 0.95; accountRealBalance += profit; totalWins++;
                 sessionCurWins++; sessionCurLosses = 0;
                 document.getElementById('sessionCurWins').innerText = sessionCurWins; document.getElementById('sessionCurLosses').innerText = sessionCurLosses;
 
-                logTradeToTable({ time: tick.time, source: pendingBet.source, type: pendingBet.type, digit: tick.digit, resultText: `+$${profit.toFixed(2)} (WIN)`, isWin: true, isVirtual: false });
+                if(bType === 'LISTA') { listTotalWins++; document.getElementById('listPlacarWins').innerText = `${listTotalWins}W`; }
+
+                logTradeToTable({ time: tick.time, source: pendingBet.source, type: pendingBet.type, digit: tick.digit, resultText: `+$${profit.toFixed(2)}`, isWin: true, isVirtual: false });
                 showToast(`VITÓRIA! Lucro: +$${profit.toFixed(2)}`, 'success'); playTone(1050, 0.2, 'sine');
                 
-                botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
-                botLastTradeEndEpoch.set(stratId, tick.epoch); botSurfLocked.set(stratId, true);
+                if (bType === 'ROBO') {
+                    botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
+                    botLastTradeEndEpoch.set(pendingBet.stratId, tick.epoch); botSurfLocked.set(pendingBet.stratId, true);
+                    decrementRealTradeCount();
+                } else if (bType === 'LISTA') {
+                    listCurrentGaleLevel = 0; listCurrentStake = parseFloat(document.getElementById('listInitialStake').value) || 1.0;
+                }
                 
-                decrementRealTradeCount();
+                pendingBet = null;
             } else {
-                const maxGales = getMaxGales();
-                const gFact = parseFloat(document.getElementById('botGaleFactor').value) || 2.0;
-
                 accountRealBalance -= stake; totalLosses++;
+                sessionCurLosses++; sessionCurWins = 0; sessionMaxLosses = Math.max(sessionMaxLosses, sessionCurLosses);
+                document.getElementById('sessionCurWins').innerText = sessionCurWins; document.getElementById('sessionCurLosses').innerText = sessionCurLosses; document.getElementById('sessionMaxLosses').innerText = sessionMaxLosses;
 
-                if (pendingBet.isAuto && botCurrentGaleLevel < maxGales) {
-                    botCurrentGaleLevel++;
-                    if (document.getElementById('inputManagement').value === 'MARTINGALE') botCurrentStake = parseFloat((botCurrentStake * gFact).toFixed(2));
-                    logTradeToTable({ time: tick.time, source: `${pendingBet.source} (Gale ${botCurrentGaleLevel - 1})`, type: pendingBet.type, digit: tick.digit, resultText: `-$${stake.toFixed(2)}`, isWin: false, isVirtual: false });
+                let maxGales = 0, gFact = 2.0;
+                if (bType === 'ROBO') { maxGales = getMaxGales(); gFact = parseFloat(document.getElementById('botGaleFactor').value) || 2.0; }
+                else if (bType === 'LISTA') { maxGales = parseInt(document.getElementById('listMaxGaleCount').value) || 0; gFact = parseFloat(document.getElementById('listGaleFactor').value) || 2.0; }
+
+                if (pendingBet.isAuto && ((bType === 'ROBO' && botCurrentGaleLevel < maxGales) || (bType === 'LISTA' && listCurrentGaleLevel < maxGales))) {
+                    
+                    let nextStake = stake;
+                    if (bType === 'ROBO') {
+                        botCurrentGaleLevel++;
+                        if (document.getElementById('inputManagement').value === 'MARTINGALE') { nextStake = parseFloat((botCurrentStake * gFact).toFixed(2)); botCurrentStake = nextStake; }
+                        logTradeToTable({ time: tick.time, source: `${pendingBet.source} (Gale ${botCurrentGaleLevel - 1})`, type: pendingBet.type, digit: tick.digit, resultText: `-$${stake.toFixed(2)}`, isWin: false, isVirtual: false });
+                    } else if (bType === 'LISTA') {
+                        listCurrentGaleLevel++;
+                        nextStake = parseFloat((listCurrentStake * gFact).toFixed(2)); listCurrentStake = nextStake;
+                        logTradeToTable({ time: tick.time, source: `${pendingBet.source} (Gale ${listCurrentGaleLevel - 1})`, type: pendingBet.type, digit: tick.digit, resultText: `-$${stake.toFixed(2)}`, isWin: false, isVirtual: false });
+                    }
+
+                    // Entra IMEDIATAMENTE com o Gale na próxima rodada
+                    const nextBet = { ...pendingBet, stake: nextStake, isGale: true, galeLevel: (bType === 'ROBO' ? botCurrentGaleLevel : listCurrentGaleLevel) };
+                    pendingBet = nextBet;
+                    wsTrade.send(JSON.stringify({
+                        buy: 1, price: nextStake, parameters: { amount: nextStake, basis: "stake", contract_type: nextBet.type === 'EVEN' ? "DIGITEVEN" : "DIGITODD", currency: "USD", duration: 1, duration_unit: "t", symbol: currentSymbol }
+                    }));
+                    showToast(`Aplicando GALE no próximo tick!`, 'info');
+
                 } else {
-                    sessionCurLosses++; sessionCurWins = 0; sessionMaxLosses = Math.max(sessionMaxLosses, sessionCurLosses);
-                    document.getElementById('sessionCurWins').innerText = sessionCurWins; document.getElementById('sessionCurLosses').innerText = sessionCurLosses; document.getElementById('sessionMaxLosses').innerText = sessionMaxLosses;
+                    if(bType === 'LISTA') { listTotalLosses++; document.getElementById('listPlacarLosses').innerText = `${listTotalLosses}L`; }
 
                     logTradeToTable({ time: tick.time, source: pendingBet.source, type: pendingBet.type, digit: tick.digit, resultText: `-$${stake.toFixed(2)} (HIT)`, isWin: false, isVirtual: false });
                     showToast(`DERROTA! Perda: -$${stake.toFixed(2)}`, 'error'); playTone(200, 0.3, 'sawtooth');
                     
-                    botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
-                    botLastTradeEndEpoch.set(stratId, tick.epoch); botSurfLocked.set(stratId, true);
+                    if (bType === 'ROBO') {
+                        botCurrentGaleLevel = 0; botCurrentStake = parseFloat(document.getElementById('botInitialStake').value) || 1.0;
+                        botLastTradeEndEpoch.set(pendingBet.stratId, tick.epoch); botSurfLocked.set(pendingBet.stratId, true);
+                        decrementRealTradeCount();
+                    } else if (bType === 'LISTA') {
+                        listCurrentGaleLevel = 0; listCurrentStake = parseFloat(document.getElementById('listInitialStake').value) || 1.0;
+                    }
                     
-                    decrementRealTradeCount();
+                    pendingBet = null;
                 }
             }
-            pendingBet = null; document.getElementById('pendingBetAlert').classList.add('hidden');
+
+            if (!pendingBet) document.getElementById('pendingBetAlert').classList.add('hidden');
             updateStatsUI();
         }
 
